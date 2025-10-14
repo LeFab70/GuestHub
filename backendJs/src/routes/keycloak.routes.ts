@@ -5,6 +5,7 @@ import { keycloakController } from '../controllers/keycloak.controller';
 const router = Router();
 
 // All Keycloak routes are temporarily disabled
+// Comment out all routes that use protectRoute
 
 /**
  * @swagger
@@ -84,7 +85,7 @@ const router = Router();
  *       500:
  *         description: Erreur serveur
  */
-router.get('/users/search', protectRoute(['ADMIN', 'MANAGER']), keycloakController.searchUsers);
+// router.get('/users/search', protectRoute(['ADMIN', 'MANAGER']), keycloakController.searchUsers);
 
 /**
  * @swagger
@@ -110,7 +111,7 @@ router.get('/users/search', protectRoute(['ADMIN', 'MANAGER']), keycloakControll
  *       500:
  *         description: Erreur serveur
  */
-router.get('/users/:id', protectRoute(['ADMIN', 'MANAGER']), keycloakController.getUserById);
+// router.get('/users/:id', protectRoute(['ADMIN', 'MANAGER']), keycloakController.getUserById);
 
 /**
  * @swagger
@@ -161,7 +162,7 @@ router.get('/users/:id', protectRoute(['ADMIN', 'MANAGER']), keycloakController.
  *       500:
  *         description: Erreur serveur
  */
-router.post('/users', protectRoute(['ADMIN']), keycloakController.createUser);
+// router.post('/users', protectRoute(['ADMIN']), keycloakController.createUser);
 
 /**
  * @swagger
@@ -208,7 +209,7 @@ router.post('/users', protectRoute(['ADMIN']), keycloakController.createUser);
  *       500:
  *         description: Erreur serveur
  */
-router.post('/users/admin', protectRoute(['ADMIN']), keycloakController.createAdmin);
+// router.post('/users/admin', protectRoute(['ADMIN']), keycloakController.createAdmin);
 
 /**
  * @swagger
@@ -255,7 +256,7 @@ router.post('/users/admin', protectRoute(['ADMIN']), keycloakController.createAd
  *       500:
  *         description: Erreur serveur
  */
-router.post('/users/receptionist', protectRoute(['ADMIN']), keycloakController.createReceptionist);
+// router.post('/users/receptionist', protectRoute(['ADMIN']), keycloakController.createReceptionist);
 
 /**
  * @swagger
@@ -298,7 +299,7 @@ router.post('/users/receptionist', protectRoute(['ADMIN']), keycloakController.c
  *       500:
  *         description: Erreur serveur
  */
-router.put('/users/:id', protectRoute(['ADMIN']), keycloakController.updateUser);
+// router.put('/users/:id', protectRoute(['ADMIN']), keycloakController.updateUser);
 
 /**
  * @swagger
@@ -339,7 +340,7 @@ router.put('/users/:id', protectRoute(['ADMIN']), keycloakController.updateUser)
  *       500:
  *         description: Erreur serveur
  */
-router.post('/users/:id/roles', protectRoute(['ADMIN']), keycloakController.assignRoles);
+// router.post('/users/:id/roles', protectRoute(['ADMIN']), keycloakController.assignRoles);
 
 /**
  * @swagger
@@ -365,7 +366,7 @@ router.post('/users/:id/roles', protectRoute(['ADMIN']), keycloakController.assi
  *       500:
  *         description: Erreur serveur
  */
-router.post('/users/:id/disable', protectRoute(['ADMIN']), keycloakController.disableUser);
+// router.post('/users/:id/disable', protectRoute(['ADMIN']), keycloakController.disableUser);
 
 /**
  * @swagger
@@ -391,7 +392,7 @@ router.post('/users/:id/disable', protectRoute(['ADMIN']), keycloakController.di
  *       500:
  *         description: Erreur serveur
  */
-router.post('/users/:id/enable', protectRoute(['ADMIN']), keycloakController.enableUser);
+// router.post('/users/:id/enable', protectRoute(['ADMIN']), keycloakController.enableUser);
 
 /**
  * @swagger

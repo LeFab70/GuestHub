@@ -480,6 +480,7 @@ export class AuthController {
           prenom: user.prenom,
           role: user.role,
           isActive: user.isActive,
+          lastLogin: user.lastLogin,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt
         })),

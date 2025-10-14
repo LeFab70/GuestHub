@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { StateService } from '../../services/state.service';
 import { Departement } from '../../models/user.model';
 
 @Component({
@@ -13,14 +14,26 @@ import { Departement } from '../../models/user.model';
     <div class="w-full space-y-4">
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-900">Gestion des Départements</h2>
-        <button 
-          (click)="openCreateModal()" 
-          class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Nouveau Département
-        </button>
+        <div class="flex items-center space-x-4">
+          <!-- Barre de recherche -->
+          <div class="flex items-center space-x-2">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearchChange()"
+              placeholder="Rechercher par nom..."
+              class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+          </div>
+          
+          <button 
+            (click)="openCreateModal()" 
+            class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nouveau Département
+          </button>
+        </div>
       </div>
 
       <!-- Tableau des départements -->
@@ -34,7 +47,12 @@ import { Departement } from '../../models/user.model';
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let department of departments">
+            <tr *ngIf="filteredDepartments.length === 0">
+              <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                Aucun département trouvé
+              </td>
+            </tr>
+            <tr *ngFor="let department of filteredDepartments">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ department.nom }}
               </td>
@@ -97,6 +115,8 @@ import { Departement } from '../../models/user.model';
 })
 export class DepartmentListComponent implements OnInit {
   departments: Departement[] = [];
+  searchTerm: string = '';
+  filteredDepartments: Departement[] = [];
   showModal = false;
   editingDepartment: Departement | null = null;
   departmentForm: Partial<Departement> = {};
@@ -117,6 +137,20 @@ export class DepartmentListComponent implements OnInit {
     });
   }
 
+  onSearchChange() {
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    this.filteredDepartments = this.departments.filter(department => {
+      // Filtre par recherche de nom
+      const matchesSearch = !this.searchTerm || 
+        department.nom.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      return matchesSearch;
+    });
+  }
+
   loadDepartments() {
     this.apiService.getDepartements().subscribe({
       next: (response) => {
@@ -130,10 +164,12 @@ export class DepartmentListComponent implements OnInit {
           this.departments = [];
           console.error('Format de données invalide pour les départements:', response);
         }
+        this.applyFilters();
       },
       error: (error) => {
         console.error('Erreur lors du chargement des départements:', error);
         this.departments = [];
+        this.applyFilters();
       }
     });
   }

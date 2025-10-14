@@ -117,16 +117,18 @@ interface User {
                   <div class="flex items-center">
                     <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                       <span class="text-sm font-medium text-blue-600">
-                        {{ user.prenom.charAt(0) }}{{ user.nom.charAt(0) }}
+                        {{ user.prenom?.charAt(0) || user.email?.charAt(0) || 'U' }}{{ user.nom?.charAt(0) || '' }}
                       </span>
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">{{ user.prenom }} {{ user.nom }}</div>
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ user.prenom && user.nom ? user.prenom + ' ' + user.nom : user.email }}
+                      </div>
                       <div class="text-sm text-gray-500">{{ user.email }}</div>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.email }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                         [class]="getRoleClass(user.role)">
@@ -139,8 +141,16 @@ interface User {
                     {{ user.isActive ? 'Actif' : 'Inactif' }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ user.lastLogin ? (user.lastLogin | date:'dd/MM/yyyy à HH:mm') : 'Jamais' }}
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <div *ngIf="user.lastLogin; else neverConnected" class="text-gray-900">
+                    <div class="font-medium">{{ user.lastLogin | date:'dd/MM/yyyy' }}</div>
+                    <div class="text-gray-500">{{ user.lastLogin | date:'HH:mm' }}</div>
+                  </div>
+                  <ng-template #neverConnected>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Jamais
+                    </span>
+                  </ng-template>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex space-x-2">

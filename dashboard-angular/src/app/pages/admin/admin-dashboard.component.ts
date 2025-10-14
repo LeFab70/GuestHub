@@ -13,6 +13,7 @@ import { NavigationService } from '../../services/navigation.service';
 import { AuthService, User } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { ApiService } from '../../services/api.service';
+import { StateService } from '../../services/state.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -235,7 +236,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private navigationService: NavigationService,
     private authService: AuthService,
     private toastService: ToastService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private stateService: StateService
   ) {}
 
   ngOnInit() {
@@ -246,6 +248,13 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     // Écouter les changements de navigation depuis le menu
     this.navigationSubscription = this.navigationService.activeTab$.subscribe(tab => {
       this.activeTab = tab;
+    });
+
+    // Écouter les changements d'état des employés pour mettre à jour les statistiques
+    this.stateService.employees$.subscribe(employees => {
+      if (employees && employees.length > 0) {
+        this.dashboardData.totalEmployees = employees.filter(emp => emp.isActive).length;
+      }
     });
 
     // Charger les données du dashboard

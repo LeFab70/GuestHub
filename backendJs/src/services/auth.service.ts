@@ -208,11 +208,15 @@ export class AuthService {
 
       logger.info('User logged in successfully', { userId: user.id, email: user.email });
 
-      // Enregistrer la connexion dans les logs d'audit
+      // Mettre à jour lastLogin et enregistrer la connexion dans les logs d'audit
       try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLogin: new Date() }
+        });
         await auditService.logLogin(user.id);
       } catch (error) {
-        logger.error('Failed to log login:', error);
+        logger.error('Failed to update lastLogin or log login:', error);
       }
 
       return {

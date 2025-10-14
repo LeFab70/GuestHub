@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
+import { StateService } from '../../services/state.service';
 import { Employe, Departement } from '../../models/user.model';
 
 @Component({
@@ -14,6 +15,29 @@ import { Employe, Departement } from '../../models/user.model';
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold text-gray-900">Gestion des Employés</h2>
         <div class="flex items-center space-x-4">
+          <!-- Barre de recherche -->
+          <div class="flex items-center space-x-2">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm" 
+              (input)="onSearchChange()"
+              placeholder="Rechercher par nom..."
+              class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+          </div>
+          
+          <!-- Filtre par département -->
+          <div class="flex items-center space-x-2">
+            <label for="departmentFilter" class="text-sm font-medium text-gray-700">Département:</label>
+            <select 
+              id="departmentFilter"
+              [(ngModel)]="departmentFilter" 
+              (change)="onDepartmentFilterChange()"
+              class="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Tous les départements</option>
+              <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.nom }}</option>
+            </select>
+          </div>
+          
           <!-- Filtre de statut -->
           <div class="flex items-center space-x-2">
             <label for="statusFilter" class="text-sm font-medium text-gray-700">Statut:</label>
@@ -27,6 +51,7 @@ import { Employe, Departement } from '../../models/user.model';
               <option value="inactive">Inactifs</option>
             </select>
           </div>
+          
           <button 
             (click)="openCreateModal()" 
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
@@ -48,7 +73,12 @@ import { Employe, Departement } from '../../models/user.model';
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let employee of employees">
+            <tr *ngIf="filteredEmployees.length === 0">
+              <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                Aucun employé trouvé
+              </td>
+            </tr>
+            <tr *ngFor="let employee of filteredEmployees">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ employee.prenom }} {{ employee.nom }}
               </td>
@@ -169,8 +199,15 @@ export class EmployeeListComponent implements OnInit {
     isActive: true
   };
   statusFilter: 'all' | 'active' | 'inactive' = 'all';
+  searchTerm: string = '';
+  departmentFilter: string = '';
+  filteredEmployees: Employe[] = [];
 
-  constructor(private apiService: ApiService, private toastService: ToastService) {}
+  constructor(
+    private apiService: ApiService, 
+    private toastService: ToastService,
+    private stateService: StateService
+  ) {}
 
   ngOnInit() {
     this.loadEmployees();
@@ -188,19 +225,26 @@ export class EmployeeListComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data && Array.isArray(response.data.data)) {
           this.employees = response.data.data;
+          this.stateService.updateEmployees(this.employees);
         } else if (response.success && Array.isArray(response.data)) {
           this.employees = response.data;
+          this.stateService.updateEmployees(this.employees);
         } else if (Array.isArray(response)) {
           this.employees = response;
+          this.stateService.updateEmployees(this.employees);
         } else {
           this.employees = [];
+          this.stateService.updateEmployees(this.employees);
           console.error('Format de données invalide:', response);
         }
+        this.applyFilters();
       },
-      error: (error) => {
-        console.error('Erreur lors du chargement des employés:', error);
-        this.employees = [];
-      }
+        error: (error) => {
+          console.error('Erreur lors du chargement des employés:', error);
+          this.employees = [];
+          this.stateService.updateEmployees(this.employees);
+          this.applyFilters();
+        }
     });
   }
 
@@ -331,6 +375,33 @@ export class EmployeeListComponent implements OnInit {
 
   onStatusFilterChange() {
     this.loadEmployees();
+  }
+
+  onSearchChange() {
+    this.applyFilters();
+  }
+
+  onDepartmentFilterChange() {
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    this.filteredEmployees = this.employees.filter(employee => {
+      // Filtre par recherche de nom
+      const matchesSearch = !this.searchTerm || 
+        `${employee.prenom} ${employee.nom}`.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      // Filtre par département
+      const matchesDepartment = !this.departmentFilter || 
+        employee.departmentId === this.departmentFilter;
+      
+      // Filtre par statut
+      const matchesStatus = this.statusFilter === 'all' || 
+        (this.statusFilter === 'active' && employee.isActive) ||
+        (this.statusFilter === 'inactive' && !employee.isActive);
+      
+      return matchesSearch && matchesDepartment && matchesStatus;
+    });
   }
 
   deleteEmployee(id: string) {
