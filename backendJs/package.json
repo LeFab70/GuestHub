@@ -14,7 +14,9 @@
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node src/database/seed.ts"
+    "db:seed": "ts-node src/database/seed.ts",
+    "db:cleanup": "ts-node src/scripts/cleanup-inconsistent-data.ts",
+    "db:reseed:coherent": "ts-node src/scripts/reseed-coherent-data.ts"
   },
   "keywords": [
     "visitor-management",

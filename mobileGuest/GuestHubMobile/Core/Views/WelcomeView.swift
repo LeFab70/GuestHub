@@ -29,10 +29,6 @@ struct WelcomeView: View {
                     navigationManager.isFrequentVisitor = true
                     navigationManager.navigateTo(.frequentVisitorInfo)
                 }
-                CustomButton(navigationManager.tr("preregistered_visit"), style: .secondary) {
-                    navigationManager.isFrequentVisitor = false
-                    navigationManager.navigateTo(.employeeSelection)
-                }
                 CustomButton(navigationManager.tr("new_visit"), style: .secondary) {
                     navigationManager.isFrequentVisitor = false
                     navigationManager.navigateTo(.employeeSelection)

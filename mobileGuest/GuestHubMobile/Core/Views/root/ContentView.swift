@@ -13,14 +13,24 @@ struct ContentView: View {
                 VisitorOptionsView()
             case .frequentVisitorInfo:
                 FrequentVisitorInfoView()
+            case .newVisitorInfo:
+                NewVisitorInfoView()
+            case .scheduledVisitsList:
+                ScheduledVisitsListView()
+            case .scheduledVisitConfirmation:
+                ScheduledVisitConfirmationView()
+            case .visitCreated:
+                VisitCreatedView()
             case .employeeSelection:
                 EmployeeSelectionView()
+            case .visitPurpose:
+                VisitPurposeView()
+            case .visitConfirmation:
+                VisitConfirmationView()
             case .confirmation:
                 ConfirmationView()
             case .welcome:
                 WelcomeView()
-            case .visitorRegistration:
-                VisitorRegistrationView()
             case .visitScheduling:
                 VisitSchedulingView()
             case .qrCodeDisplay:

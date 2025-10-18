@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
 import { StateService } from '../../services/state.service';
 import { Employe, Departement } from '../../models/user.model';
+import { PaginationComponent } from '../shared/pagination.component';
 
 @Component({
   selector: 'app-employee-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   template: `
     <div class="w-full space-y-4">
       <div class="flex justify-between items-center">
@@ -62,7 +63,8 @@ import { Employe, Departement } from '../../models/user.model';
 
       <!-- Tableau des employés -->
       <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
@@ -78,7 +80,7 @@ import { Employe, Departement } from '../../models/user.model';
                 Aucun employé trouvé
               </td>
             </tr>
-            <tr *ngFor="let employee of filteredEmployees">
+            <tr *ngFor="let employee of paginatedEmployees">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ employee.prenom }} {{ employee.nom }}
               </td>
@@ -94,39 +96,42 @@ import { Employe, Departement } from '../../models/user.model';
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                 <button (click)="editEmployee(employee)" 
-                        class="inline-flex items-center px-2 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                  Modifier
+                        class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-50 transition-colors" 
+                        title="Modifier l'employé">
+                  <span class="material-icons text-sm">edit</span>
                 </button>
                 <button (click)="toggleEmployeeStatus(employee)" 
-                        [class]="employee.isActive ? 'inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-900 hover:bg-red-50 rounded' : 'inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 hover:text-green-900 hover:bg-green-50 rounded'">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path *ngIf="employee.isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
-                    <path *ngIf="!employee.isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  {{ employee.isActive ? 'Désactiver' : 'Activer' }}
+                        [class]="employee.isActive ? 'text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors' : 'text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-50 transition-colors'"
+                        [title]="getToggleButtonTitle(employee.isActive)">
+                  <span class="material-icons text-sm">{{ employee.isActive ? 'person_off' : 'person_add' }}</span>
                 </button>
                 <button (click)="deleteEmployee(employee.id)" 
-                        class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-900 hover:bg-red-50 rounded">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                  Supprimer
+                        class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors" 
+                        title="Supprimer l'employé">
+                  <span class="material-icons text-sm">delete</span>
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
+
+      <!-- Pagination -->
+      <app-pagination 
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [totalItems]="filteredEmployees.length"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
 
       <!-- Modal de création/édition -->
       <div *ngIf="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
           <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 mb-4">
-              {{ editingEmployee ? 'Modifier l\'employé' : 'Nouvel employé' }}
+              {{ modalTitle }}
             </h3>
             <form (ngSubmit)="saveEmployee()" class="space-y-4">
               <div>
@@ -202,12 +207,25 @@ export class EmployeeListComponent implements OnInit {
   searchTerm: string = '';
   departmentFilter: string = '';
   filteredEmployees: Employe[] = [];
+  paginatedEmployees: Employe[] = [];
 
-  constructor(
-    private apiService: ApiService, 
-    private toastService: ToastService,
-    private stateService: StateService
-  ) {}
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 1;
+
+  private apiService = inject(ApiService);
+  private toastService = inject(ToastService);
+  private stateService = inject(StateService);
+  private cdr = inject(ChangeDetectorRef);
+
+  get modalTitle(): string {
+    return this.editingEmployee ? 'Modifier l\'employé' : 'Nouvel employé';
+  }
+
+  getToggleButtonTitle(isActive: boolean): string {
+    return isActive ? 'Désactiver l\'employé' : 'Activer l\'employé';
+  }
 
   ngOnInit() {
     this.loadEmployees();
@@ -281,12 +299,22 @@ export class EmployeeListComponent implements OnInit {
       isActive: true
     };
     this.showModal = true;
+    this.cdr.detectChanges();
   }
 
   editEmployee(employee: Employe) {
-    this.editingEmployee = employee;
-    this.employeeForm = { ...employee };
+    this.editingEmployee = { ...employee };
+    this.employeeForm = { 
+      prenom: employee.prenom || '',
+      nom: employee.nom || '',
+      email: employee.email || '',
+      telephone: employee.telephone || '',
+      poste: employee.poste || '',
+      departmentId: employee.departmentId || '',
+      isActive: employee.isActive !== undefined ? employee.isActive : true
+    };
     this.showModal = true;
+    this.cdr.detectChanges();
   }
 
   closeModal() {
@@ -402,6 +430,25 @@ export class EmployeeListComponent implements OnInit {
       
       return matchesSearch && matchesDepartment && matchesStatus;
     });
+    
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredEmployees.length / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, this.totalPages || 1);
+    this.updatePaginatedEmployees();
+  }
+
+  updatePaginatedEmployees() {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedEmployees = this.filteredEmployees.slice(startIndex, endIndex);
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.updatePaginatedEmployees();
   }
 
   deleteEmployee(id: string) {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -59,18 +59,14 @@ import { Departement } from '../../models/user.model';
               <td class="px-6 py-4 text-sm text-gray-500">{{ department.description }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                 <button (click)="editDepartment(department)" 
-                        class="inline-flex items-center px-2 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                  Modifier
+                        class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-50 transition-colors" 
+                        title="Modifier le département">
+                  <span class="material-icons text-sm">edit</span>
                 </button>
                 <button (click)="deleteDepartment(department.id)" 
-                        class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-900 hover:bg-red-50 rounded">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                  Supprimer
+                        class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors" 
+                        title="Supprimer le département">
+                  <span class="material-icons text-sm">delete</span>
                 </button>
               </td>
             </tr>
@@ -121,10 +117,8 @@ export class DepartmentListComponent implements OnInit {
   editingDepartment: Departement | null = null;
   departmentForm: Partial<Departement> = {};
 
-  constructor(
-    private apiService: ApiService,
-    private authService: AuthService
-  ) {}
+  private apiService = inject(ApiService);
+  private authService = inject(AuthService);
 
   ngOnInit() {
     // Vérifier si l'utilisateur est connecté avant de charger les données

@@ -235,6 +235,97 @@ export class VisitorController {
       return res.status(response.statusCode).json(response);
     }
   }
+
+  // Recherche publique de visiteurs (pour mobile)
+  async searchVisitorsPublic(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const searchTerm = req.query.search as string || '';
+      
+      if (!searchTerm) {
+        const response: ApiResponse = {
+          success: false,
+          message: 'Search term is required',
+          statusCode: 400
+        };
+        return res.status(400).json(response);
+      }
+
+      const query: SearchQuery = {
+        page: 1,
+        limit: 10,
+        search: searchTerm,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      };
+
+      const result = await visitorService.getVisitors(query);
+      
+      const response: ApiResponse = {
+        success: true,
+        data: result,
+        message: 'Visitors retrieved successfully',
+        statusCode: 200
+      };
+      return res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Public visitor search failed:', error);
+      
+      const response: ApiResponse = {
+        success: false,
+        message: error.message || 'Failed to search visitors',
+        statusCode: error.statusCode || 500
+      };
+      return res.status(response.statusCode).json(response);
+    }
+  }
+
+  // Créer un visiteur (endpoint public pour mobile)
+  async createVisitorPublic(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const visitorData: CreateVisitorRequest = req.body;
+      
+      // Vérifier que tous les champs obligatoires sont présents
+      if (!visitorData.nom || !visitorData.prenom || !visitorData.email || !visitorData.telephone || !visitorData.entreprise) {
+        const response: ApiResponse = {
+          success: false,
+          message: 'Tous les champs sont obligatoires (nom, prenom, email, telephone, entreprise)',
+          statusCode: 400
+        };
+        return res.status(400).json(response);
+      }
+
+      // Vérifier si le visiteur existe déjà
+      const existingVisitor = await visitorService.findVisitorByEmailOrPhone(visitorData.email, visitorData.telephone);
+      if (existingVisitor) {
+        const response: ApiResponse = {
+          success: false,
+          message: 'Un visiteur avec cet email ou téléphone existe déjà',
+          statusCode: 409
+        };
+        return res.status(409).json(response);
+      }
+      
+      const visitor = await visitorService.createVisitor(visitorData);
+      
+      const response: ApiResponse = {
+        success: true,
+        data: visitor,
+        message: 'Visitor created successfully',
+        statusCode: 201
+      };
+
+      return res.status(201).json(response);
+    } catch (error: any) {
+      logger.error('Create visitor public failed:', error);
+      
+      const response: ApiResponse = {
+        success: false,
+        message: error.message || 'Failed to create visitor',
+        statusCode: error.statusCode || 500
+      };
+      return res.status(response.statusCode).json(response);
+    }
+  }
 }
 
 export const visitorController = new VisitorController();

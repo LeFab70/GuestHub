@@ -1,5 +1,13 @@
 import { Request } from 'express';
-import { AuthenticatedUser } from '../middlewares/auth';
+
+// Authenticated user type
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  role: string;
+  nom: string;
+  prenom: string;
+}
 
 // User types
 export interface User {
@@ -127,6 +135,8 @@ export interface Visite {
   dateFin?: Date;
   motif: string;
   statut: VisitStatus;
+  confirmByVisitor?: string;
+  confirmedAt?: Date;
   visiteurId: string;
   visiteur?: Visitor;
   employeId: string;
@@ -141,6 +151,7 @@ export interface CreateVisiteRequest {
   motif: string;
   visiteurId: string;
   employeId: string;
+  confirmByVisitor?: string;
 }
 
 export interface UpdateVisiteRequest {
@@ -156,7 +167,7 @@ export interface UpdateVisiteRequest {
 export interface Badge {
   id: string;
   qrCode: string;
-  etat: BadgeEtat;
+  status: BadgeStatus;
   visiteId: string;
   visite?: Visite;
   createdAt: Date;
@@ -166,12 +177,12 @@ export interface Badge {
 export interface CreateBadgeRequest {
   visiteId: string;
   qrCode?: string;
-  etat?: BadgeEtat;
+  status?: BadgeStatus;
 }
 
 export interface UpdateBadgeRequest {
   qrCode?: string;
-  etat?: BadgeEtat;
+  status?: BadgeStatus;
 }
 
 // Audit Log types
@@ -247,9 +258,9 @@ export interface AuthenticatedRequest extends Request {
 }
 
 // Enums - Import from Prisma
-import { UserRole, VisitStatus, BadgeEtat } from '@prisma/client';
+import { UserRole, VisitStatus, BadgeStatus } from '@prisma/client';
 
-export { UserRole, VisitStatus, BadgeEtat };
+export { UserRole, VisitStatus, BadgeStatus };
 
 // Query types
 export interface PaginationQuery {
@@ -263,6 +274,8 @@ export interface SearchQuery extends PaginationQuery {
   search?: string;
   filter?: Record<string, any>;
   status?: 'all' | 'active' | 'inactive';
+  visiteurId?: string;
+  statut?: string;
 }
 
 // File upload types

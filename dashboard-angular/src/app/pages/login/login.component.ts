@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { ApiService } from '../../services/api.service';
@@ -351,7 +352,8 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private toastService: ToastService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private router: Router
   ) {}
 
   selectRole(role: 'ADMIN' | 'RECEPTIONNISTE') {
@@ -418,7 +420,6 @@ export class LoginComponent {
               this.isLoading = false;
             },
             error: (error: any) => {
-              console.error('Error sending forgot password email:', error);
               this.toastService.error('Erreur', 'Erreur lors de l\'envoi de l\'email de réinitialisation');
               this.isLoading = false;
             }
@@ -442,11 +443,9 @@ export class LoginComponent {
         password: this.loginForm.password
       }).subscribe({
         next: (response) => {
-          console.log('Login response:', response); // Debug log
           if (response.success) {
             // Check if password reset is required
             if (response.data.passwordResetRequired) {
-              console.log('Password reset required, showing modal'); // Debug log
               this.passwordResetUser = response.data.user;
               this.showPasswordResetModal = true;
               this.isLoading = false;
@@ -463,7 +462,6 @@ export class LoginComponent {
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Login error:', error);
           
           let errorMessage = 'Erreur de connexion. Veuillez réessayer.';
           let errorTitle = 'Erreur de connexion';
@@ -506,6 +504,30 @@ export class LoginComponent {
           message,
           5000
         );
+        
+        // Attendre un court délai pour que l'utilisateur soit stocké dans le service d'authentification
+        setTimeout(() => {
+          // Rediriger vers le dashboard approprié selon le rôle
+          if (user.role === 'ADMIN') {
+            this.router.navigate(['/admin']).then(success => {
+              // Redirection réussie
+            }).catch(error => {
+              // Erreur redirection vers /admin
+            });
+          } else if (user.role === 'RECEPTIONNISTE') {
+            this.router.navigate(['/reception']).then(success => {
+              // Redirection réussie
+            }).catch(error => {
+              // Erreur redirection vers /reception
+            });
+          } else {
+            this.router.navigate(['/admin']).then(success => {
+              // Redirection par défaut réussie
+            }).catch(error => {
+              // Erreur redirection par défaut
+            });
+          }
+        }, 500); // Délai court pour laisser le temps au service d'auth de traiter
       }
 
       // Password reset methods
@@ -536,7 +558,6 @@ export class LoginComponent {
             this.isLoading = false;
           },
           error: (error) => {
-            console.error('Error setting new password:', error);
             this.toastService.error('Erreur', 'Une erreur est survenue lors de la définition du nouveau mot de passe');
             this.isLoading = false;
           }

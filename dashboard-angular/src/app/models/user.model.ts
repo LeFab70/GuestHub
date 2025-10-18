@@ -6,7 +6,7 @@ export interface User {
   actif: boolean;
   nom?: string;
   prenom?: string;
-  role?: 'ADMIN' | 'RECEPTIONNISTE' | 'USER';
+  role?: 'ADMIN' | 'RECEPTIONNISTE';
   isActive?: boolean;
   createdAt?: Date;
   lastLogin?: Date;
@@ -23,11 +23,17 @@ export interface Employe extends User {
   isActive: boolean;
 }
 
-export interface Visiteur extends User {
+export interface Visiteur {
+  id: string;
   nom: string;
   prenom: string;
+  email: string;
   telephone: string;
+  entreprise?: string;
+  estBlackliste: boolean;
   status: VisiteurStatus;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Departement {
@@ -44,19 +50,25 @@ export interface Visite {
   employe?: Employe;
   badgeId?: string;
   badge?: Badge;
-  dateEntree: Date;
-  dateSortie?: Date;
-  status: string;
+  dateDebut: Date;
+  dateFin?: Date;
+  statut: string;
   motif: string;
   duree?: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Badge {
   id: string;
   visiteId: string;
-  dateEmission: Date;
-  etat: BadgeEtat;
+  status: BadgeStatus;
   qrCode: string;
+  dateImpression?: Date;
+  printById?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  visite?: Visite;
 }
 
 export interface Role {
@@ -93,12 +105,8 @@ export enum RoleType {
   RECEPTIONNISTE = 'RECEPTIONNISTE'
 }
 
-export enum BadgeEtat {
-  GENERE = 'GENERE',
-  EN_ATTENTE_VALIDATION = 'EN_ATTENTE_VALIDATION',
-  IMPRIME = 'IMPRIME',
-  VALIDE = 'VALIDE',
-  RENDU = 'RENDU',
-  AUTO_EXPIRE = 'AUTO_EXPIRE',
-  SCANNE = 'SCANNE'
+export enum BadgeStatus {
+  GENERATED = 'GENERATED',
+  PRINTED = 'PRINTED',
+  CLOSED = 'CLOSED'
 }

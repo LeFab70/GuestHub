@@ -29,7 +29,10 @@ import badgeRoutes from './routes/badge.routes';
 import employeeRoutes from './routes/employee.routes';
 import departmentRoutes from './routes/department.routes';
 import auditRoutes from './routes/audit.routes';
-import initRoutes from './routes/init.routes';
+import visitExpirationRoutes from './routes/visit-expiration.routes';
+import visitStatisticsRoutes from './routes/visit-statistics.routes';
+import badgeScanStatsRoutes from './routes/badge-scan-stats.routes';
+// import initRoutes from './routes/init.routes'; // Temporarily disabled
 // import keycloakRoutes from './routes/keycloak.routes'; // Temporarily disabled
 
 class App {
@@ -120,7 +123,7 @@ class App {
     });
 
     // API routes
-    this.app.use('/api/init', initRoutes);
+    // this.app.use('/api/init', initRoutes); // Temporarily disabled
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/visitors', visitorRoutes);
     this.app.use('/api/visits', visitRoutes);
@@ -128,6 +131,9 @@ class App {
     this.app.use('/api/employees', employeeRoutes);
     this.app.use('/api/departments', departmentRoutes);
     this.app.use('/api/audit', auditRoutes);
+    this.app.use('/api/visit-expiration', visitExpirationRoutes);
+    this.app.use('/api/visit-statistics', visitStatisticsRoutes);
+    this.app.use('/api/badge-scan-stats', badgeScanStatsRoutes);
     // this.app.use('/api/keycloak', keycloakRoutes); // Temporarily disabled
 
     // Setup Swagger UI

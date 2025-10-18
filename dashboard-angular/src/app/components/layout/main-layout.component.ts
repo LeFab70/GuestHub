@@ -165,7 +165,18 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         {
           label: 'Rapports',
           icon: 'assessment',
-          action: 'audit'
+          children: [
+            {
+              label: 'Logs Utilisateur',
+              icon: 'history',
+              action: 'audit'
+            },
+            {
+              label: 'Statistiques Visites',
+              icon: 'analytics',
+              action: 'reports'
+            }
+          ]
         },
         {
           label: 'Mon Profil',

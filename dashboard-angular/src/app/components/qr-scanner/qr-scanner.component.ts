@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { ToastService } from '../../services/toast.service';
+import { DashboardUpdateService } from '../../services/dashboard-update.service';
 
 @Component({
   selector: 'app-qr-scanner',
@@ -79,9 +80,22 @@ import { ToastService } from '../../services/toast.service';
             <h4 class="text-sm font-medium text-green-800">Badge scanné avec succès</h4>
             <p class="text-sm text-green-700">Code QR: {{ scanResult }}</p>
             <div *ngIf="scannedBadge.visite" class="mt-2 text-xs text-green-600">
-              <p><strong>Visiteur:</strong> {{ scannedBadge.visite.visiteur?.prenom }} {{ scannedBadge.visite.visiteur?.nom }}</p>
-              <p><strong>Employé:</strong> {{ scannedBadge.visite.employe?.prenom }} {{ scannedBadge.visite.employe?.nom }}</p>
-              <p><strong>État:</strong> {{ scannedBadge.etat }}</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <p><strong>Visiteur:</strong> {{ scannedBadge.visite.visiteur?.prenom }} {{ scannedBadge.visite.visiteur?.nom }}</p>
+                  <p><strong>Email:</strong> {{ scannedBadge.visite.visiteur?.email }}</p>
+                  <p><strong>Entreprise:</strong> {{ scannedBadge.visite.visiteur?.entreprise }}</p>
+                </div>
+                <div>
+                  <p><strong>Employé:</strong> {{ scannedBadge.visite.employe?.prenom }} {{ scannedBadge.visite.employe?.nom }}</p>
+                  <p><strong>Département:</strong> {{ scannedBadge.visite.employe?.department?.nom }}</p>
+                  <p><strong>Date visite:</strong> {{ scannedBadge.visite.dateDebut | date:'dd/MM/yyyy HH:mm' }}</p>
+                </div>
+              </div>
+              <div class="mt-2 pt-2 border-t border-green-200">
+                <p><strong>Statut badge:</strong> {{ getBadgeStatusLabel(scannedBadge.status) }}</p>
+                <p><strong>Statut visite:</strong> {{ getVisitStatusLabel(scannedBadge.visite.statut) }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -90,20 +104,12 @@ import { ToastService } from '../../services/toast.service';
       <!-- Actions après scan -->
       <div *ngIf="scanResult && scannedBadge" class="flex space-x-4">
         <button 
-          (click)="checkIn()"
-          [disabled]="isLoading"
-          class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed">
-          <span class="material-icons text-sm mr-2" *ngIf="!isLoading">login</span>
-          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" *ngIf="isLoading"></div>
-          Check-in
-        </button>
-        <button 
           (click)="checkOut()"
-          [disabled]="isLoading"
+          [disabled]="isLoading || scannedBadge.status !== 'PRINTED'"
           class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">
           <span class="material-icons text-sm mr-2" *ngIf="!isLoading">logout</span>
           <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" *ngIf="isLoading"></div>
-          Check-out
+          Terminer la visite (Check-out)
         </button>
         <button 
           (click)="clearScan()"
@@ -111,26 +117,6 @@ import { ToastService } from '../../services/toast.service';
           class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
           <span class="material-icons text-sm">clear</span>
         </button>
-      </div>
-
-      <!-- Historique des scans récents -->
-      <div class="mt-6">
-        <h4 class="text-sm font-medium text-gray-900 mb-3">Scans récents</h4>
-        <div class="space-y-2">
-          <div *ngFor="let scan of recentScans" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div class="flex items-center">
-              <span class="material-icons text-sm text-gray-500 mr-2">qr_code</span>
-              <span class="text-sm text-gray-700">{{ scan.qrCode }}</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-xs text-gray-500">{{ scan.timestamp | date:'HH:mm' }}</span>
-              <span class="px-2 py-1 text-xs rounded-full" 
-                    [class]="scan.action === 'check-in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                {{ scan.action }}
-              </span>
-            </div>
-          </div>
-        </div>
       </div>
       </div>
     </div>
@@ -140,44 +126,36 @@ export class QrScannerComponent implements OnInit, OnDestroy {
   isScanning = false;
   manualQrCode = '';
   scanResult = '';
-  recentScans: Array<{qrCode: string, action: string, timestamp: Date}> = [];
   isLoading = false;
   errorMessage = '';
   scannedBadge: any = null;
 
   constructor(
     private apiService: ApiService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private dashboardUpdateService: DashboardUpdateService
   ) {}
 
   ngOnInit() {
-    // Charger l'historique des scans depuis le localStorage
-    const saved = localStorage.getItem('recentScans');
-    if (saved) {
-      this.recentScans = JSON.parse(saved).map((scan: any) => ({
-        ...scan,
-        timestamp: new Date(scan.timestamp)
-      }));
-    }
+    // Initialisation du composant
   }
 
   ngOnDestroy() {
-    // Sauvegarder l'historique
-    localStorage.setItem('recentScans', JSON.stringify(this.recentScans));
+    // Le service gère déjà la sauvegarde
   }
+
 
   startScanning() {
     this.isScanning = true;
     this.errorMessage = '';
     
+    // TODO: Implémenter l'intégration avec un vrai scanner QR
     // Note: Dans un vrai scanner, ceci utiliserait une API de scan QR
-    // Pour la démo, on simule un scan après 2 secondes
+    // Pour l'instant, on affiche un message d'information
     setTimeout(() => {
-      // Simuler un code QR scanné (en production, ceci viendrait du scanner)
-      const mockQrCode = 'QR' + Math.random().toString(36).substr(2, 9).toUpperCase();
-      this.processQrCode(mockQrCode);
+      this.errorMessage = 'Scanner QR non disponible. Veuillez utiliser la saisie manuelle.';
       this.isScanning = false;
-    }, 2000);
+    }, 1000);
   }
 
   processQrCode(qrCode: string) {
@@ -193,7 +171,12 @@ export class QrScannerComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.success && response.data) {
           this.scannedBadge = response.data;
+          
+          // L'enregistrement du scan est maintenant géré côté serveur
+          
           this.toastService.success('Badge scanné', 'Le badge a été scanné avec succès');
+          // Déclencher la mise à jour des dashboards
+          this.dashboardUpdateService.triggerDashboardUpdate();
         } else {
           this.errorMessage = response.message || 'Badge non trouvé';
           this.toastService.error('Erreur', this.errorMessage);
@@ -209,31 +192,32 @@ export class QrScannerComponent implements OnInit, OnDestroy {
     });
   }
 
-  checkIn() {
-    if (this.scannedBadge) {
-      this.isLoading = true;
-      // Ici, vous pourriez appeler une API pour enregistrer le check-in
-      // Pour l'instant, on simule juste l'action
-      setTimeout(() => {
-        this.addToHistory(this.scanResult, 'check-in');
-        this.toastService.success('Check-in', `Check-in effectué pour le badge: ${this.scanResult}`);
-        this.clearScan();
-        this.isLoading = false;
-      }, 1000);
-    }
-  }
 
   checkOut() {
     if (this.scannedBadge) {
       this.isLoading = true;
-      // Ici, vous pourriez appeler une API pour enregistrer le check-out
-      // Pour l'instant, on simule juste l'action
-      setTimeout(() => {
-        this.addToHistory(this.scanResult, 'check-out');
-        this.toastService.success('Check-out', `Check-out effectué pour le badge: ${this.scanResult}`);
-        this.clearScan();
-        this.isLoading = false;
-      }, 1000);
+      
+      // Appeler l'API pour terminer la visite
+      this.apiService.returnBadge(this.scannedBadge.id).subscribe({
+        next: (response) => {
+          if (response.success) {
+            // L'enregistrement du check-out est maintenant géré côté serveur
+            
+            this.toastService.success('Visite terminée', `La visite de ${this.scannedBadge.visite.visiteur.prenom} ${this.scannedBadge.visite.visiteur.nom} a été terminée avec succès`);
+            // Déclencher la mise à jour des dashboards
+            this.dashboardUpdateService.triggerDashboardUpdate();
+            this.clearScan();
+          } else {
+            this.toastService.error('Erreur', response.message || 'Erreur lors de la terminaison de la visite');
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error during checkout:', error);
+          this.toastService.error('Erreur', 'Erreur lors de la terminaison de la visite');
+          this.isLoading = false;
+        }
+      });
     }
   }
 
@@ -244,16 +228,34 @@ export class QrScannerComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
   }
 
-  private addToHistory(qrCode: string, action: string) {
-    this.recentScans.unshift({
-      qrCode,
-      action,
-      timestamp: new Date()
-    });
-    
-    // Garder seulement les 10 derniers scans
-    if (this.recentScans.length > 10) {
-      this.recentScans = this.recentScans.slice(0, 10);
+
+  getBadgeStatusLabel(status: string): string {
+    switch (status) {
+      case 'GENERATED':
+        return 'Généré';
+      case 'PRINTED':
+        return 'Imprimé';
+      case 'CLOSED':
+        return 'Fermé';
+      default:
+        return status;
+    }
+  }
+
+  getVisitStatusLabel(status: string): string {
+    switch (status) {
+      case 'PLANIFIEE':
+        return 'Planifiée';
+      case 'EN_COURS':
+        return 'En cours';
+      case 'TERMINEE':
+        return 'Terminée';
+      case 'EXPIREE':
+        return 'Expirée';
+      case 'ANNULEE':
+        return 'Annulée';
+      default:
+        return status;
     }
   }
 }

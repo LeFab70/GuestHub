@@ -14,13 +14,15 @@ model User {
   password              String
   nom                   String
   prenom                String
-  role                  UserRole   @default(USER)
+  role                  UserRole   @default(RECEPTIONNISTE)
   isActive              Boolean    @default(true)
   lastLogin             DateTime?
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
   passwordResetRequired Boolean    @default(false)
   auditLogs             AuditLog[]
+  // Relations
+  printedBadges         Badge[]    @relation("BadgePrintedBy")
 
   @@map("users")
 }
@@ -71,30 +73,49 @@ model Visitor {
 }
 
 model Visite {
-  id         String      @id @default(cuid())
-  dateDebut  DateTime
-  dateFin    DateTime?
-  motif      String
-  statut     VisitStatus @default(PLANIFIEE)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  visiteurId String
-  employeId  String
-  badges     Badge[]
-  employe    Employee    @relation(fields: [employeId], references: [id])
-  visiteur   Visitor     @relation(fields: [visiteurId], references: [id])
+  id                String      @id @default(cuid())
+  dateDebut         DateTime
+  dateFin           DateTime?
+  // New fields to explicitly capture time components if needed
+  heureDebut        DateTime?
+  heureFin          DateTime?
+  motif             String
+  statut            VisitStatus @default(CREEE)
+  confirmByVisitor  String?     // Nom du visiteur qui a confirmé la visite
+  confirmedAt       DateTime?   // Date de confirmation par le visiteur
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  visiteurId        String
+  employeId         String
+  // One-to-one relation with Badge
+  badge             Badge?
+  employe           Employee    @relation(fields: [employeId], references: [id])
+  visiteur          Visitor     @relation(fields: [visiteurId], references: [id])
 
   @@map("visits")
 }
 
 model Badge {
-  id        String    @id @default(cuid())
-  qrCode    String    @unique
-  etat      BadgeEtat @default(GENERE)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  visiteId  String
-  visite    Visite    @relation(fields: [visiteId], references: [id])
+  id             String     @id @default(cuid())
+  qrCode         String     @unique
+  status         BadgeStatus @default(GENERATED)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  dateImpression DateTime?
+  printById      String?
+  printBy        User?      @relation("BadgePrintedBy", fields: [printById], references: [id])
+  // One-to-one: each badge belongs to exactly one visit
+  visiteId       String     @unique
+  visite         Visite     @relation(fields: [visiteId], references: [id])
+
+  // Deprecated fields (kept commented for reference)
+  // nomVisiteur     String?
+  // prenomVisiteur  String?
+  // nomEmploye      String?
+  // prenomEmploye   String?
+  // nomDepartement  String?
+  // dateUtilisation DateTime?
+  // dateRetour      DateTime?
 
   @@map("badges")
 }
@@ -115,22 +136,33 @@ model AuditLog {
 enum UserRole {
   ADMIN
   RECEPTIONNISTE
-  USER
 }
 
 enum VisitStatus {
-  PLANIFIEE
-  EN_COURS
-  TERMINEE
-  ANNULEE
+  CREEE       // created just now
+  PLANIFIEE   // future dateDebut
+  EN_COURS    // in progress (badge printed)
+  TERMINEE    // closed by checkout
+  EXPIREE     // auto-expired (not scanned/closed by end of day)
 }
 
-enum BadgeEtat {
-  GENERE
-  EN_ATTENTE_VALIDATION
-  IMPRIME
-  VALIDE
-  RENDU
-  SCANNE
-  AUTO_EXPIRE
+enum BadgeStatus {
+  GENERATED // for created/planified visits
+  PRINTED   // when printed; set dateImpression & printBy
+  CLOSED    // when visit ends or expires
+}
+
+model BadgeScanRecord {
+  id            String   @id @default(cuid())
+  qrCode        String
+  action        String   // 'scan' or 'check-out'
+  visitorName   String?
+  employeeName  String?
+  departmentName String?
+  visitId       String?
+  badgeId       String?
+  scannedBy     String?  // User ID who performed the scan
+  createdAt     DateTime @default(now())
+
+  @@map("badge_scan_records")
 }

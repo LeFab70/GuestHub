@@ -5,7 +5,7 @@ import { logger } from '../config/logger';
 import config from '../config/env';
 import { CreateUserRequest, LoginRequest, LoginResponse, AuthUser } from '../types';
 import { User } from '@prisma/client';
-import { auditService } from './audit.service';
+// import { auditService } from './audit.service'; // Temporarily disabled
 
 export class AuthService {
   // Hash password
@@ -79,7 +79,7 @@ export class AuthService {
       // Hash password
       const hashedPassword = await this.hashPassword(userData.password);
 
-      // Create user
+      // Create user (userData doesn't contain id, so we can use it directly)
       const user = await prisma.user.create({
         data: {
           ...userData,
@@ -214,7 +214,14 @@ export class AuthService {
           where: { id: user.id },
           data: { lastLogin: new Date() }
         });
-        await auditService.logLogin(user.id);
+        await prisma.auditLog.create({
+          data: {
+            userId: user.id,
+            action: 'LOGIN',
+            entityType: 'AUTH',
+            details: 'User logged in successfully'
+          }
+        });
       } catch (error) {
         logger.error('Failed to update lastLogin or log login:', error);
       }
@@ -423,12 +430,14 @@ export class AuthService {
       });
 
       // Log the action
-      await auditService.logAction({
-        userId: adminId,
-        action: 'PASSWORD_RESET',
-        entityType: 'USER',
-        entityId: userId,
-        details: `Admin reset password for user ${user.email}. Temporary password: ${tempPassword}`
+      await prisma.auditLog.create({
+        data: {
+          userId: adminId,
+          action: 'PASSWORD_RESET',
+          entityType: 'USER',
+          entityId: userId,
+          details: `Admin reset password for user ${user.email}. Temporary password: ${tempPassword}`
+        }
       });
 
       logger.info('User password reset successfully', { 
@@ -470,12 +479,14 @@ export class AuthService {
       });
 
       // Log the action
-      await auditService.logAction({
-        userId: userId,
-        action: 'PASSWORD_SET',
-        entityType: 'USER',
-        entityId: userId,
-        details: `User set new password after reset`
+      await prisma.auditLog.create({
+        data: {
+          userId: userId,
+          action: 'PASSWORD_SET',
+          entityType: 'USER',
+          entityId: userId,
+          details: `User set new password after reset`
+        }
       });
 
       logger.info('New password set successfully', { userId });

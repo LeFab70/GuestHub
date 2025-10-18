@@ -1,24 +1,57 @@
 import { prisma } from '../config/database';
 import { logger } from '../config/logger';
 import { CreateBadgeRequest, UpdateBadgeRequest, SearchQuery, PaginatedResponse } from '../types';
-import { Badge, BadgeEtat } from '@prisma/client';
+import { Badge, BadgeStatus } from '@prisma/client';
 import * as QRCode from 'qrcode';
+import { badgeScanStatsService } from './badge-scan-stats.service';
 
 export class BadgeService {
   // Créer un badge
   async createBadge(badgeData: CreateBadgeRequest): Promise<Badge> {
     try {
+      // Récupérer la visite avec ses relations
+      const visite = await prisma.visite.findUnique({
+        where: { id: badgeData.visiteId },
+        include: {
+          visiteur: true,
+          employe: {
+            include: {
+              department: true
+            }
+          }
+        }
+      });
+
+      if (!visite) {
+        throw new Error('Visite non trouvée');
+      }
+
+      if (!visite.visiteur) {
+        throw new Error('Aucun visiteur associé à cette visite');
+      }
+
+      if (!visite.employe) {
+        throw new Error('Aucun employé associé à cette visite');
+      }
+
+      // Générer un QR code unique
+      const qrCode = badgeData.qrCode || 'QR' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      
       const newBadge = await prisma.badge.create({
         data: {
           visiteId: badgeData.visiteId,
-          qrCode: badgeData.qrCode || '',
-          etat: badgeData.etat || BadgeEtat.GENERE,
+          qrCode: qrCode,
+          status: BadgeStatus.GENERATED
         },
         include: {
           visite: {
             include: {
               visiteur: true,
-              employe: true
+              employe: {
+                include: {
+                  department: true
+                }
+              }
             }
           }
         }
@@ -78,7 +111,11 @@ export class BadgeService {
             visite: {
               include: {
                 visiteur: true,
-                employe: true
+                employe: {
+                  include: {
+                    department: true
+                  }
+                }
               }
             }
           }
@@ -142,18 +179,24 @@ export class BadgeService {
   }
 
   // Scanner un badge (lecture QR)
-  async scanBadge(qrCode: string): Promise<Badge | null> {
+  async scanBadge(qrCode: string, scannedBy?: string): Promise<Badge | null> {
     try {
       const badge = await prisma.badge.findFirst({
-        where: { 
+        where: {
           qrCode,
-          etat: BadgeEtat.VALIDE
+          status: {
+            in: [BadgeStatus.PRINTED, BadgeStatus.CLOSED] // Accepter les badges imprimés et fermés
+          }
         },
         include: {
           visite: {
             include: {
               visiteur: true,
-              employe: true
+              employe: {
+                include: {
+                  department: true
+                }
+              }
             }
           }
         }
@@ -161,6 +204,23 @@ export class BadgeService {
       
       if (badge) {
         logger.info('Badge scanned successfully:', badge);
+        
+        // Enregistrer le scan côté serveur
+        try {
+          await badgeScanStatsService.addScanRecord({
+            qrCode,
+            action: 'scan',
+            visitorName: badge.visite?.visiteur ? `${badge.visite.visiteur.prenom} ${badge.visite.visiteur.nom}` : undefined,
+            employeeName: badge.visite?.employe ? `${badge.visite.employe.prenom} ${badge.visite.employe.nom}` : undefined,
+            departmentName: badge.visite?.employe?.department?.nom,
+            visitId: badge.visite?.id,
+            badgeId: badge.id,
+            scannedBy
+          });
+        } catch (scanRecordError) {
+          logger.error('Failed to record scan in stats:', scanRecordError);
+          // Ne pas faire échouer le scan si l'enregistrement des stats échoue
+        }
       }
       
       return badge;
@@ -176,7 +236,7 @@ export class BadgeService {
       const badge = await prisma.badge.update({
         where: { id },
         data: {
-          etat: BadgeEtat.VALIDE,
+          status: BadgeStatus.PRINTED,
           updatedAt: new Date()
         },
         include: {
@@ -202,7 +262,7 @@ export class BadgeService {
       const badge = await prisma.badge.update({
         where: { id },
         data: {
-          etat: BadgeEtat.GENERE,
+          status: BadgeStatus.GENERATED,
           updatedAt: new Date()
         },
         include: {
@@ -229,7 +289,7 @@ export class BadgeService {
       const skip = (page - 1) * limit;
 
       const where = {
-        etat: BadgeEtat.VALIDE,
+        status: BadgeStatus.PRINTED,
         ...(search ? {
           OR: [
             { qrCode: { contains: search, mode: 'insensitive' as const } },
@@ -251,7 +311,11 @@ export class BadgeService {
             visite: {
               include: {
                 visiteur: true,
-                employe: true
+                employe: {
+                  include: {
+                    department: true
+                  }
+                }
               }
             }
           }
@@ -325,26 +389,240 @@ export class BadgeService {
         totalBadges,
         generatedBadges,
         printedBadges,
-        validBadges,
-        scannedBadges
+        closedBadges
       ] = await Promise.all([
         prisma.badge.count(),
-        prisma.badge.count({ where: { etat: BadgeEtat.GENERE } }),
-        prisma.badge.count({ where: { etat: BadgeEtat.IMPRIME } }),
-        prisma.badge.count({ where: { etat: BadgeEtat.VALIDE } }),
-        prisma.badge.count({ where: { etat: BadgeEtat.SCANNE } })
+        prisma.badge.count({ where: { status: BadgeStatus.GENERATED } }),
+        prisma.badge.count({ where: { status: BadgeStatus.PRINTED } }),
+        prisma.badge.count({ where: { status: BadgeStatus.CLOSED } })
       ]);
 
       return {
         totalBadges,
         generatedBadges,
         printedBadges,
-        validBadges,
-        scannedBadges
+        closedBadges
       };
     } catch (error) {
       logger.error('Error fetching badge statistics:', error);
       throw new Error('Failed to fetch badge statistics');
+    }
+  }
+
+  /**
+   * Imprimer un badge (changer le statut vers IMPRIME)
+   */
+  async printBadge(badgeId: string, printedByUserId?: string): Promise<Badge> {
+    try {
+      const badge = await prisma.badge.findUnique({
+        where: { id: badgeId },
+        include: {
+          visite: {
+            include: {
+              visiteur: true,
+              employe: {
+                include: {
+                  department: true
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!badge) {
+        throw new Error('Badge non trouvé');
+      }
+
+      if (badge.status !== BadgeStatus.GENERATED) {
+        throw new Error('Ce badge ne peut pas être imprimé dans son état actuel');
+      }
+
+      // Mettre à jour le badge ET la visite associée en une seule transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Mettre à jour le badge
+        const updatedBadge = await tx.badge.update({
+          where: { id: badgeId },
+          data: {
+            status: BadgeStatus.PRINTED,
+            dateImpression: new Date(),
+            printById: printedByUserId
+          }
+        });
+
+        // Mettre à jour la visite associée pour qu'elle soit EN_COURS
+        if (badge.visite) {
+          await tx.visite.update({
+            where: { id: badge.visite.id },
+            data: {
+              statut: 'EN_COURS',
+              updatedAt: new Date()
+            }
+          });
+        }
+
+        // Récupérer le badge avec toutes les relations
+        return await tx.badge.findUnique({
+          where: { id: badgeId },
+          include: {
+            visite: {
+              include: {
+                visiteur: true,
+                employe: {
+                  include: {
+                    department: true
+                  }
+                }
+              }
+            }
+          }
+        });
+      });
+
+      return result!;
+    } catch (error: any) {
+      throw new Error(`Erreur lors de l'impression du badge: ${error.message}`);
+    }
+  }
+
+  /**
+   * Marquer un badge comme en utilisation (remis au visiteur)
+   */
+  async useBadge(badgeId: string): Promise<Badge> {
+    try {
+      const badge = await prisma.badge.findUnique({
+        where: { id: badgeId },
+        include: {
+          visite: true
+        }
+      });
+
+      if (!badge) {
+        throw new Error('Badge non trouvé');
+      }
+
+      if (badge.status !== BadgeStatus.PRINTED) {
+        throw new Error('Ce badge doit être imprimé avant d\'être utilisé');
+      }
+
+      // Mettre à jour la visite associée pour qu'elle soit EN_COURS
+      if (badge.visite) {
+        await prisma.visite.update({
+          where: { id: badge.visite.id },
+          data: {
+            statut: 'EN_COURS',
+            updatedAt: new Date()
+          }
+        });
+      }
+
+      const updatedBadge = await prisma.badge.update({
+        where: { id: badgeId },
+        data: {
+          // In the simplified workflow, using the badge keeps status as PRINTED
+          status: BadgeStatus.PRINTED
+        },
+        include: {
+          visite: {
+            include: {
+              visiteur: true,
+              employe: {
+                include: {
+                  department: true
+                }
+              }
+            }
+          }
+        }
+      });
+
+      return updatedBadge;
+    } catch (error: any) {
+      throw new Error(`Erreur lors de l'utilisation du badge: ${error.message}`);
+    }
+  }
+
+  /**
+   * Marquer un badge comme rendu (visite terminée)
+   */
+  async returnBadge(badgeId: string, returnedBy?: string): Promise<Badge> {
+    try {
+      const badge = await prisma.badge.findUnique({
+        where: { id: badgeId },
+        include: {
+          visite: true
+        }
+      });
+
+      if (!badge) {
+        throw new Error('Badge non trouvé');
+      }
+
+      if (badge.status !== BadgeStatus.PRINTED) {
+        throw new Error('Ce badge doit être imprimé/en cours avant d\'être rendu');
+      }
+
+      // Mettre à jour le badge ET la visite associée en une seule transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Mettre à jour le badge
+        const updatedBadge = await tx.badge.update({
+          where: { id: badgeId },
+          data: {
+            status: BadgeStatus.CLOSED,
+            updatedAt: new Date()
+          }
+        });
+
+        // Mettre à jour la visite associée pour qu'elle soit TERMINEE
+        if (badge.visite) {
+          await tx.visite.update({
+            where: { id: badge.visite.id },
+            data: {
+              statut: 'TERMINEE',
+              dateFin: new Date(),
+              updatedAt: new Date()
+            }
+          });
+        }
+
+        // Récupérer le badge avec toutes les relations
+        return await tx.badge.findUnique({
+          where: { id: badgeId },
+          include: {
+            visite: {
+              include: {
+                visiteur: true,
+                employe: {
+                  include: {
+                    department: true
+                  }
+                }
+              }
+            }
+          }
+        });
+      });
+
+      // Enregistrer le check-out côté serveur
+      try {
+        await badgeScanStatsService.addScanRecord({
+          qrCode: result!.qrCode,
+          action: 'check-out',
+          visitorName: result!.visite?.visiteur ? `${result!.visite.visiteur.prenom} ${result!.visite.visiteur.nom}` : undefined,
+          employeeName: result!.visite?.employe ? `${result!.visite.employe.prenom} ${result!.visite.employe.nom}` : undefined,
+          departmentName: result!.visite?.employe?.department?.nom,
+          visitId: result!.visite?.id,
+          badgeId: result!.id,
+          scannedBy: returnedBy
+        });
+      } catch (scanRecordError) {
+        logger.error('Failed to record check-out in stats:', scanRecordError);
+        // Ne pas faire échouer le retour si l'enregistrement des stats échoue
+      }
+
+      return result!;
+    } catch (error: any) {
+      throw new Error(`Erreur lors du retour du badge: ${error.message}`);
     }
   }
 }

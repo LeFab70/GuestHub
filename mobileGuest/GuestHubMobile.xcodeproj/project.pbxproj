@@ -8,11 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		A1234567890ABCDEF001 /* GuestHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF000 /* GuestHubApp.swift */; };
-		A1234567890ABCDEF002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF003 /* ContentView.swift */; };
 		A1234567890ABCDEF004 /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF005 /* NavigationManager.swift */; };
 		A1234567890ABCDEF006 /* VisitorDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF007 /* VisitorDataService.swift */; };
 		A1234567890ABCDEF008 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF009 /* WelcomeView.swift */; };
-		A1234567890ABCDEF010 /* VisitorRegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF011 /* VisitorRegistrationView.swift */; };
 		A1234567890ABCDEF012 /* VisitSchedulingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF013 /* VisitSchedulingView.swift */; };
 		A1234567890ABCDEF014 /* QRCodeDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF015 /* QRCodeDisplayView.swift */; };
 		A1234567890ABCDEF016 /* VisitStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF017 /* VisitStatusView.swift */; };
@@ -22,6 +20,18 @@
 		A1234567890ABCDEF024 /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF025 /* QRCodeView.swift */; };
 		A1234567890ABCDEF026 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF027 /* HeaderView.swift */; };
 		A1234567890ABCDEF028 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF029 /* AppConfig.swift */; };
+		F508EEDF2EA34C4300F86D0B /* VisitPurposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F508EEDE2EA34C4300F86D0B /* VisitPurposeView.swift */; };
+		F508EEE02EA34C4300F86D0B /* VisitConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F508EEDD2EA34C4300F86D0B /* VisitConfirmationView.swift */; };
+		F508EEE22EA37AA500F86D0B /* ScheduledVisitConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F508EEE12EA37AA500F86D0B /* ScheduledVisitConfirmationView.swift */; };
+		F54A93BC2EA31F0600F50C5D /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93B82EA31F0600F50C5D /* APIService.swift */; };
+		F54A93BD2EA31F0600F50C5D /* VisitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93BA2EA31F0600F50C5D /* VisitorService.swift */; };
+		F54A93BE2EA31F0600F50C5D /* VisitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93BB2EA31F0600F50C5D /* VisitService.swift */; };
+		F54A93BF2EA31F0600F50C5D /* EmployeeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93B92EA31F0600F50C5D /* EmployeeService.swift */; };
+		F54A93C12EA31F6000F50C5D /* Contents.json in Resources */ = {isa = PBXBuildFile; fileRef = F54A93C02EA31F6000F50C5D /* Contents.json */; };
+		F54A93C32EA31FA600F50C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54A93C22EA31FA600F50C5D /* Assets.xcassets */; };
+		F54A93C82EA3204200F50C5D /* ScheduledVisitsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93C42EA3204200F50C5D /* ScheduledVisitsListView.swift */; };
+		F54A93CA2EA3204200F50C5D /* VisitCreatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93C62EA3204200F50C5D /* VisitCreatedView.swift */; };
+		F5C604B62EA3C3AA00CA576A /* NewVisitorInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5C604B52EA3C3AA00CA576A /* NewVisitorInfoView.swift */; };
 		F5D9AF762E8EC3BB008EB91F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5D9AF752E8EC3BB008EB91F /* Assets.xcassets */; };
 		F5D9AF7E2E8EC41C008EB91F /* EmployeeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF782E8EC41C008EB91F /* EmployeeSelectionView.swift */; };
 		F5D9AF7F2E8EC41C008EB91F /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF772E8EC41C008EB91F /* ConfirmationView.swift */; };
@@ -32,11 +42,9 @@
 
 /* Begin PBXFileReference section */
 		A1234567890ABCDEF000 /* GuestHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestHubApp.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF005 /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF007 /* VisitorDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorDataService.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF009 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
-		A1234567890ABCDEF011 /* VisitorRegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorRegistrationView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF013 /* VisitSchedulingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitSchedulingView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF015 /* QRCodeDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeDisplayView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF017 /* VisitStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitStatusView.swift; sourceTree = "<group>"; };
@@ -47,6 +55,18 @@
 		A1234567890ABCDEF027 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF029 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		A1234567890ABCDEF030 /* GuestHubMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GuestHubMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F508EEDD2EA34C4300F86D0B /* VisitConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitConfirmationView.swift; sourceTree = "<group>"; };
+		F508EEDE2EA34C4300F86D0B /* VisitPurposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitPurposeView.swift; sourceTree = "<group>"; };
+		F508EEE12EA37AA500F86D0B /* ScheduledVisitConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledVisitConfirmationView.swift; sourceTree = "<group>"; };
+		F54A93B82EA31F0600F50C5D /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		F54A93B92EA31F0600F50C5D /* EmployeeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeService.swift; sourceTree = "<group>"; };
+		F54A93BA2EA31F0600F50C5D /* VisitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorService.swift; sourceTree = "<group>"; };
+		F54A93BB2EA31F0600F50C5D /* VisitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitService.swift; sourceTree = "<group>"; };
+		F54A93C02EA31F6000F50C5D /* Contents.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Contents.json; sourceTree = "<group>"; };
+		F54A93C22EA31FA600F50C5D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F54A93C42EA3204200F50C5D /* ScheduledVisitsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledVisitsListView.swift; sourceTree = "<group>"; };
+		F54A93C62EA3204200F50C5D /* VisitCreatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitCreatedView.swift; sourceTree = "<group>"; };
+		F5C604B52EA3C3AA00CA576A /* NewVisitorInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewVisitorInfoView.swift; sourceTree = "<group>"; };
 		F5D9AF752E8EC3BB008EB91F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5D9AF772E8EC41C008EB91F /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
 		F5D9AF782E8EC41C008EB91F /* EmployeeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeSelectionView.swift; sourceTree = "<group>"; };
@@ -101,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				A1234567890ABCDEF000 /* GuestHubApp.swift */,
+				F54A93C02EA31F6000F50C5D /* Contents.json */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -116,6 +137,7 @@
 		A1234567890ABCDEF037 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				F54A93C22EA31FA600F50C5D /* Assets.xcassets */,
 				A1234567890ABCDEF038 /* Services */,
 				A1234567890ABCDEF039 /* Views */,
 				A1234567890ABCDEF040 /* ComponentsViews */,
@@ -126,6 +148,10 @@
 		A1234567890ABCDEF038 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				F54A93B82EA31F0600F50C5D /* APIService.swift */,
+				F54A93B92EA31F0600F50C5D /* EmployeeService.swift */,
+				F54A93BA2EA31F0600F50C5D /* VisitorService.swift */,
+				F54A93BB2EA31F0600F50C5D /* VisitService.swift */,
 				A1234567890ABCDEF005 /* NavigationManager.swift */,
 				A1234567890ABCDEF007 /* VisitorDataService.swift */,
 			);
@@ -135,6 +161,12 @@
 		A1234567890ABCDEF039 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F5C604B52EA3C3AA00CA576A /* NewVisitorInfoView.swift */,
+				F508EEE12EA37AA500F86D0B /* ScheduledVisitConfirmationView.swift */,
+				F508EEDD2EA34C4300F86D0B /* VisitConfirmationView.swift */,
+				F508EEDE2EA34C4300F86D0B /* VisitPurposeView.swift */,
+				F54A93C42EA3204200F50C5D /* ScheduledVisitsListView.swift */,
+				F54A93C62EA3204200F50C5D /* VisitCreatedView.swift */,
 				F5D9AF772E8EC41C008EB91F /* ConfirmationView.swift */,
 				F5D9AF782E8EC41C008EB91F /* EmployeeSelectionView.swift */,
 				F5D9AF792E8EC41C008EB91F /* FrequentVisitorInfoView.swift */,
@@ -143,7 +175,6 @@
 				F5D9AF7D2E8EC41C008EB91F /* VisitorOptionsView.swift */,
 				A1234567890ABCDEF041 /* root */,
 				A1234567890ABCDEF009 /* WelcomeView.swift */,
-				A1234567890ABCDEF011 /* VisitorRegistrationView.swift */,
 				A1234567890ABCDEF013 /* VisitSchedulingView.swift */,
 				A1234567890ABCDEF015 /* QRCodeDisplayView.swift */,
 				A1234567890ABCDEF017 /* VisitStatusView.swift */,
@@ -166,7 +197,6 @@
 		A1234567890ABCDEF041 /* root */ = {
 			isa = PBXGroup;
 			children = (
-				A1234567890ABCDEF003 /* ContentView.swift */,
 			);
 			path = root;
 			sourceTree = "<group>";
@@ -233,6 +263,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5D9AF762E8EC3BB008EB91F /* Assets.xcassets in Resources */,
+				F54A93C32EA31FA600F50C5D /* Assets.xcassets in Resources */,
+				F54A93C12EA31F6000F50C5D /* Contents.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,17 +276,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1234567890ABCDEF001 /* GuestHubApp.swift in Sources */,
-				A1234567890ABCDEF002 /* ContentView.swift in Sources */,
 				A1234567890ABCDEF004 /* NavigationManager.swift in Sources */,
 				A1234567890ABCDEF006 /* VisitorDataService.swift in Sources */,
 				A1234567890ABCDEF008 /* WelcomeView.swift in Sources */,
-				A1234567890ABCDEF010 /* VisitorRegistrationView.swift in Sources */,
 				A1234567890ABCDEF012 /* VisitSchedulingView.swift in Sources */,
 				A1234567890ABCDEF014 /* QRCodeDisplayView.swift in Sources */,
 				A1234567890ABCDEF016 /* VisitStatusView.swift in Sources */,
 				A1234567890ABCDEF018 /* CheckOutView.swift in Sources */,
 				A1234567890ABCDEF020 /* CustomButton.swift in Sources */,
 				A1234567890ABCDEF022 /* CustomTextField.swift in Sources */,
+				F54A93C82EA3204200F50C5D /* ScheduledVisitsListView.swift in Sources */,
+				F54A93CA2EA3204200F50C5D /* VisitCreatedView.swift in Sources */,
 				F5D9AF7E2E8EC41C008EB91F /* EmployeeSelectionView.swift in Sources */,
 				F5D9AF7F2E8EC41C008EB91F /* ConfirmationView.swift in Sources */,
 				F5D9AF802E8EC41C008EB91F /* FrequentVisitorInfoView.swift in Sources */,
@@ -262,7 +294,15 @@
 				F5D9AF822E8EC41C008EB91F /* VisitorOptionsView.swift in Sources */,
 				A1234567890ABCDEF024 /* QRCodeView.swift in Sources */,
 				A1234567890ABCDEF026 /* HeaderView.swift in Sources */,
+				F54A93BC2EA31F0600F50C5D /* APIService.swift in Sources */,
+				F54A93BD2EA31F0600F50C5D /* VisitorService.swift in Sources */,
+				F54A93BE2EA31F0600F50C5D /* VisitService.swift in Sources */,
+				F5C604B62EA3C3AA00CA576A /* NewVisitorInfoView.swift in Sources */,
+				F54A93BF2EA31F0600F50C5D /* EmployeeService.swift in Sources */,
+				F508EEDF2EA34C4300F86D0B /* VisitPurposeView.swift in Sources */,
+				F508EEE02EA34C4300F86D0B /* VisitConfirmationView.swift in Sources */,
 				A1234567890ABCDEF028 /* AppConfig.swift in Sources */,
+				F508EEE22EA37AA500F86D0B /* ScheduledVisitConfirmationView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -401,6 +441,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -429,6 +470,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -469,5 +511,3 @@
 	};
 	rootObject = A1234567890ABCDEF046 /* Project object */;
 }
-
-

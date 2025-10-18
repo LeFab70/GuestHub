@@ -63,13 +63,9 @@ export class AuthService {
           
           // Réinitialiser la navigation à la vue d'ensemble
           this.navigationService.setActiveTab('overview');
-          
-          // Rediriger vers le dashboard approprié
-          this.router.navigate([user.role === 'ADMIN' ? '/admin' : '/reception']);
         }
       }),
       catchError((error) => {
-        console.error('Login error:', error);
         return throwError(() => error);
       })
     );
@@ -87,6 +83,24 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
+    const token = localStorage.getItem('accessToken'); // Corriger: utiliser 'accessToken' au lieu de 'token'
+    if (!token) {
+      return false;
+    }
+    
+    // Vérifier si le token est expiré
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      if (payload.exp < currentTime) {
+        this.logout();
+        return false;
+      }
+    } catch (error) {
+      this.logout();
+      return false;
+    }
+    
     return this.currentUserSubject.value !== null;
   }
 

@@ -18,8 +18,9 @@ export class VisitorService {
         }
       }
 
+      const { nom, prenom, email, telephone, entreprise, estBlackliste } = visitorData as any;
       const visitor = await prisma.visitor.create({
-        data: visitorData
+        data: { nom, prenom, email, telephone, entreprise, estBlackliste }
       });
 
       logger.info('Visitor created successfully', { visitorId: visitor.id, email: visitor.email });
@@ -64,12 +65,28 @@ export class VisitorService {
 
       // Add search functionality
       if (search) {
-        where.OR = [
-          { nom: { contains: search, mode: 'insensitive' } },
-          { prenom: { contains: search, mode: 'insensitive' } },
-          { email: { contains: search, mode: 'insensitive' } },
-          { entreprise: { contains: search, mode: 'insensitive' } }
-        ];
+        // Vérifier si c'est un email ou un téléphone pour une recherche exacte
+        const isEmail = search.includes('@');
+        const isPhone = /^\d+$/.test(search);
+        
+        if (isEmail) {
+          // Recherche exacte pour l'email
+          where.OR = [
+            { email: { equals: search, mode: 'insensitive' } }
+          ];
+        } else if (isPhone) {
+          // Recherche exacte pour le téléphone
+          where.OR = [
+            { telephone: { equals: search } }
+          ];
+        } else {
+          // Recherche partielle pour nom, prénom, entreprise
+          where.OR = [
+            { nom: { contains: search, mode: 'insensitive' } },
+            { prenom: { contains: search, mode: 'insensitive' } },
+            { entreprise: { contains: search, mode: 'insensitive' } }
+          ];
+        }
       }
 
       // Get total count
@@ -123,9 +140,10 @@ export class VisitorService {
         }
       }
 
+      const { nom, prenom, email, telephone, entreprise, estBlackliste } = updateData as any;
       const visitor = await prisma.visitor.update({
         where: { id },
-        data: updateData
+        data: { nom, prenom, email, telephone, entreprise, estBlackliste }
       });
 
       logger.info('Visitor updated successfully', { visitorId: id });
@@ -140,18 +158,23 @@ export class VisitorService {
   // Delete visitor
   async deleteVisitor(id: string): Promise<boolean> {
     try {
-      // Check if visitor has active visits
-      const activeVisits = await prisma.visite.findFirst({
+      // Check if visitor has any visits
+      const visits = await prisma.visite.findMany({
         where: {
-          visiteurId: id,
-          statut: { in: ['PLANIFIEE', 'EN_COURS'] }
+          visiteurId: id
         }
       });
 
-      if (activeVisits) {
-        throw new Error('Cannot delete visitor with active visits');
+      if (visits.length > 0) {
+        // If visitor has visits, delete them first (cascade delete)
+        await prisma.visite.deleteMany({
+          where: {
+            visiteurId: id
+          }
+        });
       }
 
+      // Now delete the visitor
       await prisma.visitor.delete({
         where: { id }
       });
@@ -323,6 +346,25 @@ export class VisitorService {
       return visitor?.estBlackliste || false;
     } catch (error) {
       logger.error('Check visitor blacklist status failed:', error);
+      throw error;
+    }
+  }
+
+  // Find visitor by email or phone
+  async findVisitorByEmailOrPhone(email: string, phone: string): Promise<Visitor | null> {
+    try {
+      const visitor = await prisma.visitor.findFirst({
+        where: {
+          OR: [
+            { email: email },
+            { telephone: phone }
+          ]
+        }
+      });
+
+      return visitor;
+    } catch (error) {
+      logger.error('Find visitor by email or phone failed:', error);
       throw error;
     }
   }

@@ -756,6 +756,132 @@ router.post('/set-new-password', authRateLimit, authController.setNewPassword);
  *       500:
  *         description: Server error
  */
+/**
+ * @swagger
+ * /api/auth/users/{userId}:
+ *   put:
+ *     summary: Update user by ID (Admin only)
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               login:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 50
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               nom:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
+ *               prenom:
+ *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, RECEPTIONNISTE]
+ *               isActive:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     login:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     nom:
+ *                       type: string
+ *                     prenom:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                     isActive:
+ *                       type: boolean
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     lastLogin:
+ *                       type: string
+ *                       format: date-time
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Bad request - validation error or duplicate email/login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/users/:userId', authenticateToken, requireAdmin, logAccess, authController.updateUser);
+
+/**
+ * @swagger
+ * /api/auth/users/{userId}:
+ *   delete:
+ *     summary: Delete user by ID (Admin only)
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID to delete
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
 router.delete('/users/:userId', authenticateToken, requireAdmin, logAccess, authController.deleteUser);
 
 export default router;

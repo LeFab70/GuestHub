@@ -2,9 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service';
 import { logger } from '../config/logger';
 import { ApiResponse, LoginRequest, CreateUserRequest } from '../types';
-import { authenticateToken, requireAdmin, ROLES, AuthenticatedUser } from '../middlewares/auth';
+import { authenticateToken, requireAdmin } from '../middlewares/auth';
 import { prisma } from '../config/database';
-import { auditService } from '../services/audit.service';
 import bcrypt from 'bcryptjs';
 import config from '../config/env';
 
@@ -123,7 +122,7 @@ export class AuthController {
   // Get current user profile
   async getProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const authenticatedUser = req.user as AuthenticatedUser | undefined;
+      const authenticatedUser = req.user;
       const userId = authenticatedUser?.id;
       
       if (!userId) {
@@ -179,7 +178,7 @@ export class AuthController {
   // Update user profile
   async updateProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const authenticatedUser = req.user as AuthenticatedUser | undefined;
+      const authenticatedUser = req.user;
       const userId = authenticatedUser?.id;
       const updateData = req.body;
       
@@ -234,7 +233,7 @@ export class AuthController {
   // Change password
   async changePassword(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     try {
-      const authenticatedUser = req.user as AuthenticatedUser | undefined;
+      const authenticatedUser = req.user;
       const userId = authenticatedUser?.id;
       const { currentPassword, newPassword, confirmPassword } = req.body;
       
@@ -353,7 +352,7 @@ export class AuthController {
       const userData = req.body;
 
       // Validate role
-      if (!userData.role || !Object.values(ROLES).includes(userData.role)) {
+      if (!userData.role || !['ADMIN', 'RECEPTIONNISTE'].includes(userData.role)) {
         const response: ApiResponse = {
           success: false,
           message: 'Role must be ADMIN or RECEPTIONNISTE',
@@ -702,12 +701,14 @@ export class AuthController {
       });
 
       // Log the action
-      await auditService.logAction({
-        userId: adminId,
-        action: 'DELETE',
-        entityType: 'USER',
-        entityId: userId,
-        details: `Admin deleted user ${user.email}`
+      await prisma.auditLog.create({
+        data: {
+          userId: adminId,
+          action: 'DELETE',
+          entityType: 'USER',
+          entityId: userId,
+          details: `Admin deleted user ${user.email}`
+        }
       });
 
       const response: ApiResponse = {
@@ -727,6 +728,135 @@ export class AuthController {
       };
 
       return res.status(500).json(response);
+    }
+  }
+
+  /**
+   * Update user by ID (Admin only)
+   */
+  async updateUser(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const { login, email, nom, prenom, role, isActive } = req.body;
+      const adminId = (req as any).user?.id;
+
+      if (!adminId) {
+        const response: ApiResponse = {
+          success: false,
+          error: 'Non autorisé',
+          statusCode: 401
+        };
+        res.status(401).json(response);
+        return;
+      }
+
+      // Check if user exists
+      const existingUser = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!existingUser) {
+        const response: ApiResponse = {
+          success: false,
+          error: 'Utilisateur non trouvé',
+          statusCode: 404
+        };
+        res.status(404).json(response);
+        return;
+      }
+
+      // Check if email or login already exists for another user
+      if (email && email !== existingUser.email) {
+        const emailExists = await prisma.user.findFirst({
+          where: { 
+            email: email,
+            id: { not: userId }
+          }
+        });
+
+        if (emailExists) {
+          const response: ApiResponse = {
+            success: false,
+            error: 'Un utilisateur avec cet email existe déjà',
+            statusCode: 400
+          };
+          res.status(400).json(response);
+          return;
+        }
+      }
+
+      if (login && login !== existingUser.login) {
+        const loginExists = await prisma.user.findFirst({
+          where: { 
+            login: login,
+            id: { not: userId }
+          }
+        });
+
+        if (loginExists) {
+          const response: ApiResponse = {
+            success: false,
+            error: 'Un utilisateur avec ce login existe déjà',
+            statusCode: 400
+          };
+          res.status(400).json(response);
+          return;
+        }
+      }
+
+      // Update user
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          ...(login && { login }),
+          ...(email && { email }),
+          ...(nom && { nom }),
+          ...(prenom && { prenom }),
+          ...(role && { role }),
+          ...(isActive !== undefined && { isActive })
+        },
+        select: {
+          id: true,
+          login: true,
+          email: true,
+          nom: true,
+          prenom: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+          lastLogin: true
+        }
+      });
+
+      // Log the action
+      await prisma.auditLog.create({
+        data: {
+          userId: adminId,
+          action: 'UPDATE',
+          entityType: 'USER',
+          entityId: userId,
+          details: `Admin updated user ${updatedUser.email}`
+        }
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        data: updatedUser,
+        message: 'Utilisateur mis à jour avec succès',
+        statusCode: 200
+      };
+
+      res.status(200).json(response);
+    } catch (error: any) {
+      logger.error('Update user failed:', error);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: error.message || 'Erreur lors de la mise à jour de l\'utilisateur',
+        statusCode: 500
+      };
+
+      res.status(500).json(response);
     }
   }
 

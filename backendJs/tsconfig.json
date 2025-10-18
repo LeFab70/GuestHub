@@ -32,13 +32,12 @@
       "@/routes/*": ["src/routes/*"],
       "@/database/*": ["src/database/*"],
       "@/utils/*": ["src/utils/*"],
-      "@/types/*": ["src/types/*"],
-      "@/validators/*": ["src/validators/*"]
+      "@/types/*": ["src/types/*"]
     },
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": [
     "src/**/*"

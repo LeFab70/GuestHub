@@ -1,9 +1,32 @@
 import { Router } from 'express';
+import { param } from 'express-validator';
 import { visitController } from '../controllers/visit.controller';
-import { visitValidations } from '../validators';
+import { visitValidations, handleValidationErrors } from '../validators';
 import { authRateLimit } from '../middlewares/security';
+import { authenticateToken, requireReceptionistOrAdmin } from '../middlewares/auth';
+
+// Custom validators
+const isValidCUID = (value: string): boolean => {
+  const cuidPattern = /^c[a-z0-9]{24}$/;
+  return cuidPattern.test(value);
+};
 
 const router = Router();
+
+// Route publique pour la création de visites (mobile)
+router.post('/public', visitValidations.create, visitController.createVisitPublic);
+
+// Route publique pour confirmer une visite par le visiteur (mobile)
+router.patch('/:id/confirm', [
+  param('id').custom(isValidCUID).withMessage('ID de visite invalide'),
+  handleValidationErrors
+], visitController.confirmVisitByVisitor);
+
+// Route publique pour récupérer les visites planifiées d'un visiteur (mobile)
+router.get('/scheduled/:visiteurId', [
+  param('visiteurId').custom(isValidCUID).withMessage('ID de visiteur invalide'),
+  handleValidationErrors
+], visitController.getScheduledVisitsByVisitor);
 
 /**
  * @swagger
@@ -53,7 +76,7 @@ const router = Router();
  *       500:
  *         description: Erreur serveur
  */
-router.post('/', authRateLimit, ...visitValidations.create, visitController.createVisit);
+router.post('/', authenticateToken, requireReceptionistOrAdmin, authRateLimit, ...visitValidations.create, visitController.createVisit);
 
 /**
  * @swagger
@@ -87,13 +110,22 @@ router.post('/', authRateLimit, ...visitValidations.create, visitController.crea
  *           type: string
  *           enum: [asc, desc]
  *           default: desc
+ *       - in: query
+ *         name: visiteurId
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: statut
+ *         schema:
+ *           type: string
+ *           enum: [PLANIFIEE, EN_COURS, TERMINEE, ANNULEE]
  *     responses:
  *       200:
  *         description: Liste des visites récupérée avec succès
  *       500:
  *         description: Erreur serveur
  */
-router.get('/', visitController.getAllVisits);
+router.get('/', authenticateToken, requireReceptionistOrAdmin, visitController.getAllVisits);
 
 /**
  * @swagger
@@ -133,7 +165,7 @@ router.get('/', visitController.getAllVisits);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/active', visitController.getActiveVisits);
+router.get('/active', authenticateToken, requireReceptionistOrAdmin, visitController.getActiveVisits);
 
 /**
  * @swagger
@@ -158,7 +190,31 @@ router.get('/active', visitController.getActiveVisits);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/stats', visitController.getVisitStats);
+router.get('/stats', authenticateToken, requireReceptionistOrAdmin, visitController.getVisitStats);
+
+/**
+ * @swagger
+ * /api/visits/recent:
+ *   get:
+ *     summary: Obtenir les visites récentes (pour les notifications)
+ *     tags: [Visits]
+ *     parameters:
+ *       - in: query
+ *         name: since
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Date depuis laquelle récupérer les visites
+ *     responses:
+ *       200:
+ *         description: Visites récentes récupérées avec succès
+ *       400:
+ *         description: Paramètre "since" manquant
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get('/recent', authenticateToken, requireReceptionistOrAdmin, visitController.getRecentVisits);
 
 /**
  * @swagger
@@ -180,7 +236,7 @@ router.get('/stats', visitController.getVisitStats);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/:id', visitController.getVisitById);
+router.get('/:id', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitController.getVisitById);
 
 /**
  * @swagger
@@ -233,7 +289,7 @@ router.get('/:id', visitController.getVisitById);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/:id', ...visitValidations.update, visitController.updateVisit);
+router.put('/:id', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), ...visitValidations.update, visitController.updateVisit);
 
 /**
  * @swagger
@@ -255,7 +311,7 @@ router.put('/:id', ...visitValidations.update, visitController.updateVisit);
  *       500:
  *         description: Erreur serveur
  */
-router.delete('/:id', visitController.deleteVisit);
+router.delete('/:id', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitController.deleteVisit);
 
 /**
  * @swagger
@@ -277,7 +333,7 @@ router.delete('/:id', visitController.deleteVisit);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/:id/check-in', visitController.checkIn);
+router.patch('/:id/check-in', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitController.checkIn);
 
 /**
  * @swagger
@@ -299,6 +355,6 @@ router.patch('/:id/check-in', visitController.checkIn);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/:id/check-out', visitController.checkOut);
+router.patch('/:id/check-out', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitController.checkOut);
 
 export default router;

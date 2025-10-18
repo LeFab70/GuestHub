@@ -1,147 +1,131 @@
-# GuestHub Mobile - Application iOS
+# GuestHub Mobile App
 
-Application mobile SwiftUI pour la gestion des visites dans le système GuestHub.
-
-## Structure du Projet
-
-```
-mobileGuest/
-├── App/                          # Point d'entrée de l'application
-│   └── GuestHubApp.swift        # Fichier principal de l'app
-├── Views/                        # Configuration et vues principales
-│   └── AppConfig.swift          # Configuration de l'application
-├── Core/                        # Logique métier et composants
-│   ├── Services/                # Services et gestion des données
-│   │   ├── NavigationManager.swift
-│   │   └── VisitorDataService.swift
-│   ├── Views/                   # Vues de l'application
-│   │   ├── root/
-│   │   │   └── ContentView.swift
-│   │   ├── WelcomeView.swift
-│   │   ├── VisitorRegistrationView.swift
-│   │   ├── VisitSchedulingView.swift
-│   │   ├── QRCodeDisplayView.swift
-│   │   ├── VisitStatusView.swift
-│   │   └── CheckOutView.swift
-│   └── ComponentsViews/         # Composants réutilisables
-│       ├── CustomButton.swift
-│       ├── CustomTextField.swift
-│       ├── QRCodeView.swift
-│       └── HeaderView.swift
-```
-
-## Fonctionnalités
-
-### 🏠 **Vue d'accueil (WelcomeView)**
-- Interface d'accueil avec logo et titre
-- Boutons pour nouvelle visite et consultation des visites
-- Design moderne avec dégradé
-
-### 👤 **Enregistrement visiteur (VisitorRegistrationView)**
-- Formulaire de saisie des informations personnelles
-- Champs : prénom, nom, email, téléphone, entreprise
-- Toggle pour visiteur blacklisté
-- Validation des champs obligatoires
-
-### 📅 **Planification visite (VisitSchedulingView)**
-- Sélection de la date et des heures
-- Saisie du motif de la visite
-- Choix de la personne à visiter
-- Génération automatique du QR code
-
-### 📱 **Affichage QR Code (QRCodeDisplayView)**
-- Affichage du QR code généré
-- Détails de la visite
-- Navigation vers le statut ou nouvelle visite
-
-### 📊 **Statut des visites (VisitStatusView)**
-- Liste des visites avec statuts
-- Cartes d'information pour chaque visite
-- Actions contextuelles (check-out si en cours)
-
-### ✅ **Check-out (CheckOutView)**
-- Finalisation des visites en cours
-- Sélection de l'heure de sortie
-- Notes optionnelles
-- Mise à jour du statut
-
-## Composants Réutilisables
-
-### CustomButton
-- Boutons stylisés avec différents styles (primary, secondary, success, danger)
-- Support des états désactivés
-- Animations fluides
-
-### CustomTextField
-- Champs de texte personnalisés
-- Support des différents types de clavier
-- Champs sécurisés pour les mots de passe
-- Validation visuelle
-
-### QRCodeView
-- Génération et affichage de QR codes
-- Taille personnalisable
-- Gestion d'erreur si génération échoue
-
-### HeaderView
-- En-tête standardisé pour toutes les vues
-- Support du bouton retour
-- Titre et sous-titre configurables
-
-## Services
-
-### NavigationManager
-- Gestion de la navigation entre les vues
-- État centralisé de l'application
-- Animations de transition
-
-### VisitorDataService
-- Gestion des données des visiteurs et visites
-- Modèles de données (Visitor, Visit, VisitStatus)
-- Données d'exemple pour le développement
-
-## Technologies Utilisées
-
-- **SwiftUI** : Framework UI d'Apple
-- **Combine** : Gestion des flux de données
-- **CoreImage** : Génération des QR codes
-- **Foundation** : Types de base et utilitaires
-
-## Configuration
-
-L'application utilise `AppConfig.swift` pour centraliser :
-- Configuration de l'API
-- Couleurs et thèmes
-- Polices
-- Durées d'animation
-
-## Installation
-
-1. Ouvrir le projet dans Xcode
-2. Sélectionner un simulateur iOS
-3. Compiler et exécuter (⌘+R)
+Application mobile iOS pour la gestion des visites, connectée au backend Node.js.
 
 ## Architecture
 
-L'application suit une architecture MVVM (Model-View-ViewModel) :
-- **Model** : Visitor, Visit, VisitStatus
-- **View** : Toutes les vues SwiftUI
-- **ViewModel** : NavigationManager, VisitorDataService
+### Services Singleton
 
-## Navigation
+L'application utilise des services singleton pour gérer les données et la communication avec le backend :
 
-Le flux de navigation suit le parcours utilisateur :
-1. Accueil → Enregistrement visiteur
-2. Enregistrement → Planification visite
-3. Planification → Affichage QR code
-4. QR code → Statut des visites
-5. Statut → Check-out (si visite en cours)
+#### 1. **APIService** (`Core/Services/APIService.swift`)
+- Service principal pour la communication avec le backend
+- Gère les appels HTTP vers `http://localhost:3001/api`
+- Modèles de données correspondant au backend
+- Gestion des erreurs et des réponses
 
-## Personnalisation
+#### 2. **VisitorService** (`Core/Services/VisitorService.swift`)
+- Gestion des visiteurs
+- Recherche de visiteurs existants par email/téléphone
+- Création de nouveaux visiteurs
+- Gestion des visites planifiées
 
-- Modifier `AppConfig.swift` pour changer les couleurs et polices
-- Ajouter de nouveaux composants dans `Core/ComponentsViews/`
-- Étendre les services dans `Core/Services/`
-- Créer de nouvelles vues dans `Core/Views/`
+#### 3. **EmployeeService** (`Core/Services/EmployeeService.swift`)
+- Gestion des employés
+- Chargement de la liste des employés actifs
+- Recherche et sélection d'employés
+- Affichage des départements
 
+#### 4. **VisitService** (`Core/Services/VisitService.swift`)
+- Gestion des visites
+- Création de nouvelles visites
+- Confirmation des visites planifiées
+- Gestion des statuts et durées
 
+### Flux de Navigation
+
+#### 1. **Visiteur Fréquent**
+1. Sélection de la langue
+2. "Je viens souvent" → Saisie email/téléphone
+3. Recherche du visiteur dans la base
+4. Si trouvé :
+   - Visites planifiées → Confirmation
+   - Pas de visites → Création nouvelle visite
+5. Si non trouvé → Création nouveau profil
+
+#### 2. **Visite Pré-enregistrée**
+1. Sélection de la langue
+2. "Visite pré-enregistrée" → Saisie email/téléphone
+3. Recherche du visiteur
+4. Affichage des visites planifiées
+5. Confirmation de la visite
+
+#### 3. **Nouveau Visiteur**
+1. Sélection de la langue
+2. "Nouvelle visite" → Inscription
+3. Saisie des informations personnelles
+4. Sélection de l'employé
+5. Saisie du motif de visite
+6. Confirmation et création
+
+### Vues Principales
+
+- **LanguageSelectionView** : Choix de la langue
+- **VisitorOptionsView** : Options de visite
+- **FrequentVisitorInfoView** : Recherche visiteur fréquent
+- **VisitorRegistrationView** : Inscription nouveau visiteur
+- **ScheduledVisitsListView** : Liste des visites planifiées
+- **EmployeeSelectionView** : Sélection de l'employé
+- **VisitPurposeView** : Saisie du motif de visite
+- **VisitConfirmationView** : Confirmation avant création
+- **VisitCreatedView** : Succès et instructions
+
+### Intégration Backend
+
+#### Endpoints Utilisés
+
+- `GET /visitors` : Liste des visiteurs
+- `POST /visitors` : Création d'un visiteur
+- `GET /employees` : Liste des employés
+- `GET /visits` : Liste des visites
+- `POST /visits` : Création d'une visite
+- `PATCH /visits/:id/check-in` : Confirmation d'une visite
+
+#### Modèles de Données
+
+Les modèles correspondent exactement à ceux du backend :
+- `BackendVisitor` : Visiteur
+- `BackendEmployee` : Employé
+- `BackendVisit` : Visite
+- `BackendBadge` : Badge
+- `BackendDepartment` : Département
+
+### Workflow de Visite
+
+1. **Création/Recherche du visiteur**
+2. **Sélection de l'employé à visiter**
+3. **Saisie du motif et de la durée**
+4. **Confirmation des informations**
+5. **Création de la visite** → Badge généré en attente d'impression
+6. **Instructions pour aller à la réception**
+
+### Synchronisation Dashboard
+
+Quand une visite est créée :
+- Le badge est généré avec le statut `GENERATED`
+- Les informations sont mises à jour sur le dashboard réceptionniste
+- Le compteur "Badges à imprimer" est incrémenté
+- La visite apparaît dans la liste des visites récentes
+
+### Test de Connexion
+
+Utilisez le script `test-backend-connection.swift` pour vérifier la connexion :
+
+```bash
+swift test-backend-connection.swift
+```
+
+### Prérequis
+
+- Backend Node.js en cours d'exécution sur `http://localhost:3001`
+- Base de données PostgreSQL avec les données de test
+- Xcode pour compiler l'application iOS
+
+### Configuration
+
+L'URL du backend est configurée dans `APIService.swift` :
+```swift
+private let baseURL = "http://localhost:3001/api"
+```
+
+Modifiez cette URL selon votre configuration de déploiement.

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { badgeController } from '../controllers/badge.controller';
 import { badgeValidations } from '../validators';
 import { authRateLimit } from '../middlewares/security';
+import { authenticateToken, requireReceptionistOrAdmin } from '../middlewares/auth';
 
 const router = Router();
 
@@ -43,7 +44,7 @@ const router = Router();
  *       500:
  *         description: Erreur serveur
  */
-router.post('/', authRateLimit, ...badgeValidations.create, badgeController.createBadge);
+router.post('/', authenticateToken, requireReceptionistOrAdmin, authRateLimit, ...badgeValidations.create, badgeController.createBadge);
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ router.post('/', authRateLimit, ...badgeValidations.create, badgeController.crea
  *       500:
  *         description: Erreur serveur
  */
-router.get('/', badgeController.getAllBadges);
+router.get('/', authenticateToken, requireReceptionistOrAdmin, badgeController.getAllBadges);
 
 /**
  * @swagger
@@ -123,7 +124,7 @@ router.get('/', badgeController.getAllBadges);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/active', badgeController.getActiveBadges);
+router.get('/active', authenticateToken, requireReceptionistOrAdmin, badgeController.getActiveBadges);
 
 /**
  * @swagger
@@ -150,7 +151,7 @@ router.get('/active', badgeController.getActiveBadges);
  *       500:
  *         description: Erreur serveur
  */
-router.post('/scan', badgeController.scanBadge);
+router.post('/scan', authenticateToken, requireReceptionistOrAdmin, badgeController.scanBadge);
 
 /**
  * @swagger
@@ -172,7 +173,7 @@ router.post('/scan', badgeController.scanBadge);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/:id', badgeController.getBadgeById);
+router.get('/:id', authenticateToken, requireReceptionistOrAdmin, badgeController.getBadgeById);
 
 /**
  * @swagger
@@ -218,7 +219,7 @@ router.get('/:id', badgeController.getBadgeById);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/:id', ...badgeValidations.update, badgeController.updateBadge);
+router.put('/:id', authenticateToken, requireReceptionistOrAdmin, ...badgeValidations.update, badgeController.updateBadge);
 
 /**
  * @swagger
@@ -240,7 +241,7 @@ router.put('/:id', ...badgeValidations.update, badgeController.updateBadge);
  *       500:
  *         description: Erreur serveur
  */
-router.delete('/:id', badgeController.deleteBadge);
+router.delete('/:id', authenticateToken, requireReceptionistOrAdmin, badgeController.deleteBadge);
 
 /**
  * @swagger
@@ -262,7 +263,7 @@ router.delete('/:id', badgeController.deleteBadge);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/:id/activate', badgeController.activateBadge);
+router.patch('/:id/activate', authenticateToken, requireReceptionistOrAdmin, badgeController.activateBadge);
 
 /**
  * @swagger
@@ -284,7 +285,7 @@ router.patch('/:id/activate', badgeController.activateBadge);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/:id/deactivate', badgeController.deactivateBadge);
+router.patch('/:id/deactivate', authenticateToken, requireReceptionistOrAdmin, badgeController.deactivateBadge);
 
 /**
  * @swagger
@@ -306,6 +307,78 @@ router.patch('/:id/deactivate', badgeController.deactivateBadge);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/:id/qr-code', badgeController.generateQRCode);
+router.get('/:id/qr-code', authenticateToken, requireReceptionistOrAdmin, badgeController.generateQRCode);
+
+/**
+ * @swagger
+ * /api/badges/{id}/print:
+ *   put:
+ *     summary: Imprimer un badge
+ *     tags: [Badges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Badge imprimé avec succès
+ *       404:
+ *         description: Badge non trouvé
+ *       400:
+ *         description: Badge ne peut pas être imprimé
+ *       500:
+ *         description: Erreur serveur
+ */
+router.put('/:id/print', authenticateToken, requireReceptionistOrAdmin, badgeController.printBadge);
+
+/**
+ * @swagger
+ * /api/badges/{id}/use:
+ *   put:
+ *     summary: Marquer un badge comme en utilisation
+ *     tags: [Badges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Badge marqué comme en utilisation
+ *       404:
+ *         description: Badge non trouvé
+ *       400:
+ *         description: Badge ne peut pas être utilisé
+ *       500:
+ *         description: Erreur serveur
+ */
+router.put('/:id/use', authenticateToken, requireReceptionistOrAdmin, badgeController.useBadge);
+
+/**
+ * @swagger
+ * /api/badges/{id}/return:
+ *   put:
+ *     summary: Marquer un badge comme rendu
+ *     tags: [Badges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Badge marqué comme rendu
+ *       404:
+ *         description: Badge non trouvé
+ *       400:
+ *         description: Badge ne peut pas être rendu
+ *       500:
+ *         description: Erreur serveur
+ */
+router.put('/:id/return', authenticateToken, requireReceptionistOrAdmin, badgeController.returnBadge);
 
 export default router;

@@ -5,37 +5,48 @@ struct CustomButton: View {
     let action: () -> Void
     let style: ButtonStyle
     let isEnabled: Bool
+    let isLoading: Bool
     
     init(
         _ title: String,
         style: ButtonStyle = .primary,
         isEnabled: Bool = true,
+        isLoading: Bool = false,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.style = style
         self.isEnabled = isEnabled
+        self.isLoading = isLoading
         self.action = action
     }
     
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(style.textColor)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(style.backgroundColor)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(style.borderColor, lineWidth: 1)
-                )
+            HStack {
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: style.textColor))
+                        .scaleEffect(0.8)
+                }
+                
+                Text(isLoading ? "Chargement..." : title)
+                    .font(.headline)
+                    .foregroundColor(style.textColor)
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(style.backgroundColor)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(style.borderColor, lineWidth: 1)
+            )
         }
-        .disabled(!isEnabled)
-        .opacity(isEnabled ? 1.0 : 0.6)
+        .disabled(!isEnabled || isLoading)
+        .opacity((isEnabled && !isLoading) ? 1.0 : 0.6)
     }
 }
 

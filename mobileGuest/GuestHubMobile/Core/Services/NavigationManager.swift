@@ -10,11 +10,16 @@ enum AppView {
     case languageSelection
     case visitorOptions
     case frequentVisitorInfo
+    case newVisitorInfo
+    case scheduledVisitsList
+    case scheduledVisitConfirmation
+    case visitCreated
     case employeeSelection
+    case visitPurpose
+    case visitConfirmation
     case confirmation
     // Existing (kept for future use)
     case welcome
-    case visitorRegistration
     case visitScheduling
     case qrCodeDisplay
     case visitStatus
@@ -53,20 +58,26 @@ class NavigationManager: ObservableObject {
             navigateTo(.languageSelection)
         case .frequentVisitorInfo:
             navigateTo(.visitorOptions)
+        case .newVisitorInfo:
+            navigateTo(.visitorOptions)
+        case .scheduledVisitsList:
+            navigateTo(.frequentVisitorInfo)
+        case .scheduledVisitConfirmation:
+            navigateTo(.scheduledVisitsList)
+        case .visitCreated:
+            navigateTo(.visitorOptions)
         case .employeeSelection:
-            if isFrequentVisitor == true {
-                navigateTo(.frequentVisitorInfo)
-            } else {
-                navigateTo(.visitorOptions)
-            }
+            navigateTo(.frequentVisitorInfo)
+        case .visitPurpose:
+            navigateTo(.employeeSelection)
+        case .visitConfirmation:
+            navigateTo(.visitPurpose)
         case .confirmation:
             navigateTo(.employeeSelection)
         case .welcome:
             break
-        case .visitorRegistration:
-            navigateTo(.welcome)
         case .visitScheduling:
-            navigateTo(.visitorRegistration)
+            navigateTo(.confirmation)
         case .qrCodeDisplay:
             navigateTo(.visitScheduling)
         case .visitStatus:
@@ -86,9 +97,8 @@ class NavigationManager: ObservableObject {
             "back": "Retour",
             "visitor_flow_title": "Bienvenue",
             "visitor_flow_sub": "Veuillez sélectionner une option",
-            "frequent_visitor": "Je viens souvent",
-            "preregistered_visit": "Visite pré-enregistrée",
-            "new_visit": "Nouvelle visite",
+        "frequent_visitor": "Je viens souvent",
+        "new_visitor": "Nouveau visiteur",
             "enter_contact": "Entrez votre email ou téléphone",
             "employee_select_title": "Choix de l'employé",
             "employee_select_sub": "Qui venez-vous visiter ?",
@@ -104,9 +114,8 @@ class NavigationManager: ObservableObject {
             "back": "Back",
             "visitor_flow_title": "Welcome",
             "visitor_flow_sub": "Please select an option",
-            "frequent_visitor": "I visit often",
-            "preregistered_visit": "Pre-registered visit",
-            "new_visit": "New visit",
+        "frequent_visitor": "I visit often",
+        "new_visitor": "New visitor",
             "enter_contact": "Enter your email or phone",
             "employee_select_title": "Employee selection",
             "employee_select_sub": "Who are you visiting?",

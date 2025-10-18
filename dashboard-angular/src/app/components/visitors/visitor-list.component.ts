@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { Visiteur, VisiteurStatus } from '../../models/user.model';
+import { PaginationComponent } from '../shared/pagination.component';
 
 @Component({
   selector: 'app-visitor-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   template: `
     <div class="w-full space-y-4">
       <div class="flex justify-between items-center">
@@ -33,8 +34,8 @@ import { Visiteur, VisiteurStatus } from '../../models/user.model';
             <select [(ngModel)]="statusFilter" (change)="filterVisitors()" 
                     class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
               <option value="">Tous</option>
-              <option value="ACTIF">Actif</option>
-              <option value="BLACKLISTED">Blacklisté</option>
+              <option value="false">Actif</option>
+              <option value="true">Blacklisté</option>
             </select>
           </div>
           <div class="flex items-end">
@@ -48,7 +49,8 @@ import { Visiteur, VisiteurStatus } from '../../models/user.model';
 
       <!-- Tableau des visiteurs -->
       <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
@@ -59,30 +61,49 @@ import { Visiteur, VisiteurStatus } from '../../models/user.model';
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let visitor of filteredVisitors">
+            <tr *ngFor="let visitor of paginatedVisitors">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                 {{ visitor.prenom }} {{ visitor.nom }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ visitor.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ visitor.telephone }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span [class]="visitor.status === 'ACTIF' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" 
+                <span [class]="!visitor.estBlackliste ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" 
                       class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                  {{ visitor.status === 'ACTIF' ? 'Actif' : 'Blacklisté' }}
+                  {{ !visitor.estBlackliste ? 'Actif' : 'Blacklisté' }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <button (click)="editVisitor(visitor)" class="text-indigo-600 hover:text-indigo-900">Modifier</button>
-                <button (click)="toggleVisitorStatus(visitor)" 
-                        [class]="visitor.status === 'ACTIF' ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'">
-                  {{ visitor.status === 'ACTIF' ? 'Blacklister' : 'Activer' }}
+                <button (click)="editVisitor(visitor)" 
+                        class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-50 transition-colors" 
+                        title="Modifier le visiteur">
+                  <span class="material-icons text-sm">edit</span>
                 </button>
-                <button (click)="deleteVisitor(visitor.id)" class="text-red-600 hover:text-red-900">Supprimer</button>
+                <button (click)="toggleVisitorStatus(visitor)" 
+                        [class]="!visitor.estBlackliste ? 'text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors' : 'text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-50 transition-colors'"
+                        [title]="!visitor.estBlackliste ? 'Blacklister le visiteur' : 'Activer le visiteur'">
+                  <span class="material-icons text-sm">{{ !visitor.estBlackliste ? 'block' : 'check_circle' }}</span>
+                </button>
+                <button (click)="deleteVisitor(visitor.id)" 
+                        class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors" 
+                        title="Supprimer le visiteur">
+                  <span class="material-icons text-sm">delete</span>
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
+        </div>
       </div>
+
+      <!-- Pagination -->
+      <app-pagination 
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [totalItems]="filteredVisitors.length"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)">
+      </app-pagination>
 
       <!-- Modal de création/édition -->
       <div *ngIf="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
@@ -113,22 +134,15 @@ import { Visiteur, VisiteurStatus } from '../../models/user.model';
                        class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700">Login</label>
-                <input [(ngModel)]="visitorForm.login" name="login" type="text" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Statut</label>
-                <select [(ngModel)]="visitorForm.status" name="status"
-                        class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
-                  <option value="ACTIF">Actif</option>
-                  <option value="BLACKLISTED">Blacklisté</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700">Entreprise</label>
+                <input [(ngModel)]="visitorForm.entreprise" name="entreprise" type="text"
+                       class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                       placeholder="Nom de l'entreprise (optionnel)">
               </div>
               <div class="flex items-center">
-                <input [(ngModel)]="visitorForm.actif" name="actif" type="checkbox" 
-                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label class="ml-2 block text-sm text-gray-900">Actif</label>
+                <input [(ngModel)]="visitorForm.estBlackliste" name="estBlackliste" type="checkbox" 
+                       class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <label class="ml-2 block text-sm text-gray-900">Blacklisté</label>
               </div>
               <div class="flex justify-end space-x-3">
                 <button type="button" (click)="closeModal()" 
@@ -150,13 +164,19 @@ import { Visiteur, VisiteurStatus } from '../../models/user.model';
 export class VisitorListComponent implements OnInit {
   visitors: Visiteur[] = [];
   filteredVisitors: Visiteur[] = [];
+  paginatedVisitors: Visiteur[] = [];
   showModal = false;
   editingVisitor: Visiteur | null = null;
   visitorForm: Partial<Visiteur> = {};
   searchTerm = '';
   statusFilter = '';
 
-  constructor(private apiService: ApiService) {}
+  // Pagination
+  currentPage = 1;
+  pageSize = 10;
+  totalPages = 1;
+
+  private apiService = inject(ApiService);
 
   ngOnInit() {
     this.loadVisitors();
@@ -164,11 +184,20 @@ export class VisitorListComponent implements OnInit {
 
   loadVisitors() {
     this.apiService.getVisiteurs().subscribe({
-      next: (data) => {
-        this.visitors = data;
-        this.filterVisitors();
+      next: (response) => {
+        if (response.success && response.data && response.data.data) {
+          this.visitors = response.data.data;
+          this.filterVisitors();
+        } else {
+          this.visitors = [];
+          this.filteredVisitors = [];
+        }
       },
-      error: (error) => console.error('Erreur lors du chargement des visiteurs:', error)
+      error: (error) => {
+        console.error('Erreur lors du chargement des visiteurs:', error);
+        this.visitors = [];
+        this.filteredVisitors = [];
+      }
     });
   }
 
@@ -180,23 +209,42 @@ export class VisitorListComponent implements OnInit {
         visitor.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         visitor.telephone.includes(this.searchTerm);
       
-      const matchesStatus = !this.statusFilter || visitor.status === this.statusFilter;
+      const matchesStatus = !this.statusFilter || visitor.estBlackliste.toString() === this.statusFilter;
       
       return matchesSearch && matchesStatus;
     });
+    
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.filteredVisitors.length / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, this.totalPages || 1);
+    this.updatePaginatedVisitors();
+  }
+
+  updatePaginatedVisitors() {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedVisitors = this.filteredVisitors.slice(startIndex, endIndex);
+  }
+
+  onPageChange(page: number) {
+    this.currentPage = page;
+    this.updatePaginatedVisitors();
   }
 
   clearFilters() {
     this.searchTerm = '';
     this.statusFilter = '';
+    this.currentPage = 1;
     this.filterVisitors();
   }
 
   openCreateModal() {
     this.editingVisitor = null;
     this.visitorForm = { 
-      actif: true, 
-      status: VisiteurStatus.ACTIF 
+      estBlackliste: false
     };
     this.showModal = true;
   }
@@ -234,9 +282,7 @@ export class VisitorListComponent implements OnInit {
   }
 
   toggleVisitorStatus(visitor: Visiteur) {
-    const newStatus = visitor.status === VisiteurStatus.ACTIF ? 
-      VisiteurStatus.BLACKLISTED : VisiteurStatus.ACTIF;
-    const updatedVisitor = { ...visitor, status: newStatus };
+    const updatedVisitor = { ...visitor, estBlackliste: !visitor.estBlackliste };
     
     this.apiService.updateVisiteur(visitor.id, updatedVisitor).subscribe({
       next: () => this.loadVisitors(),

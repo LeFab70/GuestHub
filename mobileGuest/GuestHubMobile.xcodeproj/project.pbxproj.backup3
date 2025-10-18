@@ -1,0 +1,499 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1234567890ABCDEF001 /* GuestHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF000 /* GuestHubApp.swift */; };
+		A1234567890ABCDEF002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF003 /* ContentView.swift */; };
+		A1234567890ABCDEF004 /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF005 /* NavigationManager.swift */; };
+		A1234567890ABCDEF006 /* VisitorDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF007 /* VisitorDataService.swift */; };
+		A1234567890ABCDEF008 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF009 /* WelcomeView.swift */; };
+		A1234567890ABCDEF012 /* VisitSchedulingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF013 /* VisitSchedulingView.swift */; };
+		A1234567890ABCDEF014 /* QRCodeDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF015 /* QRCodeDisplayView.swift */; };
+		A1234567890ABCDEF016 /* VisitStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF017 /* VisitStatusView.swift */; };
+		A1234567890ABCDEF018 /* CheckOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF019 /* CheckOutView.swift */; };
+		A1234567890ABCDEF020 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF021 /* CustomButton.swift */; };
+		A1234567890ABCDEF022 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF023 /* CustomTextField.swift */; };
+		A1234567890ABCDEF024 /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF025 /* QRCodeView.swift */; };
+		A1234567890ABCDEF026 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF027 /* HeaderView.swift */; };
+		A1234567890ABCDEF028 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1234567890ABCDEF029 /* AppConfig.swift */; };
+		F54A93BC2EA31F0600F50C5D /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93B82EA31F0600F50C5D /* APIService.swift */; };
+		F54A93BD2EA31F0600F50C5D /* VisitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93BA2EA31F0600F50C5D /* VisitorService.swift */; };
+		F54A93BE2EA31F0600F50C5D /* VisitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93BB2EA31F0600F50C5D /* VisitService.swift */; };
+		F54A93BF2EA31F0600F50C5D /* EmployeeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93B92EA31F0600F50C5D /* EmployeeService.swift */; };
+		F54A93C12EA31F6000F50C5D /* Contents.json in Resources */ = {isa = PBXBuildFile; fileRef = F54A93C02EA31F6000F50C5D /* Contents.json */; };
+		F54A93C32EA31FA600F50C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F54A93C22EA31FA600F50C5D /* Assets.xcassets */; };
+		F54A93C82EA3204200F50C5D /* ScheduledVisitsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93C42EA3204200F50C5D /* ScheduledVisitsListView.swift */; };
+		F54A93CA2EA3204200F50C5D /* VisitCreatedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F54A93C62EA3204200F50C5D /* VisitCreatedView.swift */; };
+		F5D9AF762E8EC3BB008EB91F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5D9AF752E8EC3BB008EB91F /* Assets.xcassets */; };
+		F5D9AF7E2E8EC41C008EB91F /* EmployeeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF782E8EC41C008EB91F /* EmployeeSelectionView.swift */; };
+		F5D9AF7F2E8EC41C008EB91F /* ConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF772E8EC41C008EB91F /* ConfirmationView.swift */; };
+		F5D9AF802E8EC41C008EB91F /* FrequentVisitorInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF792E8EC41C008EB91F /* FrequentVisitorInfoView.swift */; };
+		F5D9AF812E8EC41C008EB91F /* LanguageSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF7A2E8EC41C008EB91F /* LanguageSelectionView.swift */; };
+		F5D9AF822E8EC41C008EB91F /* VisitorOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5D9AF7D2E8EC41C008EB91F /* VisitorOptionsView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A1234567890ABCDEF000 /* GuestHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestHubApp.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF003 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF005 /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF007 /* VisitorDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorDataService.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF009 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF013 /* VisitSchedulingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitSchedulingView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF015 /* QRCodeDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeDisplayView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF017 /* VisitStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitStatusView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF019 /* CheckOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckOutView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF021 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF023 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF025 /* QRCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF027 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF029 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		A1234567890ABCDEF030 /* GuestHubMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GuestHubMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F54A93B82EA31F0600F50C5D /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
+		F54A93B92EA31F0600F50C5D /* EmployeeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeService.swift; sourceTree = "<group>"; };
+		F54A93BA2EA31F0600F50C5D /* VisitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorService.swift; sourceTree = "<group>"; };
+		F54A93BB2EA31F0600F50C5D /* VisitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitService.swift; sourceTree = "<group>"; };
+		F54A93C02EA31F6000F50C5D /* Contents.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Contents.json; sourceTree = "<group>"; };
+		F54A93C22EA31FA600F50C5D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F54A93C42EA3204200F50C5D /* ScheduledVisitsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledVisitsListView.swift; sourceTree = "<group>"; };
+		F54A93C62EA3204200F50C5D /* VisitCreatedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitCreatedView.swift; sourceTree = "<group>"; };
+		F5D9AF752E8EC3BB008EB91F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F5D9AF772E8EC41C008EB91F /* ConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmationView.swift; sourceTree = "<group>"; };
+		F5D9AF782E8EC41C008EB91F /* EmployeeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmployeeSelectionView.swift; sourceTree = "<group>"; };
+		F5D9AF792E8EC41C008EB91F /* FrequentVisitorInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequentVisitorInfoView.swift; sourceTree = "<group>"; };
+		F5D9AF7A2E8EC41C008EB91F /* LanguageSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionView.swift; sourceTree = "<group>"; };
+		F5D9AF7D2E8EC41C008EB91F /* VisitorOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitorOptionsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		F5D9AF7C2E8EC41C008EB91F /* root */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = root; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1234567890ABCDEF031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1234567890ABCDEF032 = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF033 /* GuestHubMobile */,
+				A1234567890ABCDEF034 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF033 /* GuestHubMobile */ = {
+			isa = PBXGroup;
+			children = (
+				F5D9AF752E8EC3BB008EB91F /* Assets.xcassets */,
+				A1234567890ABCDEF035 /* App */,
+				A1234567890ABCDEF036 /* Views */,
+				A1234567890ABCDEF037 /* Core */,
+			);
+			path = GuestHubMobile;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF034 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF030 /* GuestHubMobile.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF035 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF000 /* GuestHubApp.swift */,
+				F54A93C02EA31F6000F50C5D /* Contents.json */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF036 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF029 /* AppConfig.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF037 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				F54A93C22EA31FA600F50C5D /* Assets.xcassets */,
+				A1234567890ABCDEF038 /* Services */,
+				A1234567890ABCDEF039 /* Views */,
+				A1234567890ABCDEF040 /* ComponentsViews */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF038 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F54A93B82EA31F0600F50C5D /* APIService.swift */,
+				F54A93B92EA31F0600F50C5D /* EmployeeService.swift */,
+				F54A93BA2EA31F0600F50C5D /* VisitorService.swift */,
+				F54A93BB2EA31F0600F50C5D /* VisitService.swift */,
+				A1234567890ABCDEF005 /* NavigationManager.swift */,
+				A1234567890ABCDEF007 /* VisitorDataService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF039 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F54A93C42EA3204200F50C5D /* ScheduledVisitsListView.swift */,
+				F54A93C62EA3204200F50C5D /* VisitCreatedView.swift */,
+				F5D9AF772E8EC41C008EB91F /* ConfirmationView.swift */,
+				F5D9AF782E8EC41C008EB91F /* EmployeeSelectionView.swift */,
+				F5D9AF792E8EC41C008EB91F /* FrequentVisitorInfoView.swift */,
+				F5D9AF7A2E8EC41C008EB91F /* LanguageSelectionView.swift */,
+				F5D9AF7C2E8EC41C008EB91F /* root */,
+				F5D9AF7D2E8EC41C008EB91F /* VisitorOptionsView.swift */,
+				A1234567890ABCDEF041 /* root */,
+				A1234567890ABCDEF009 /* WelcomeView.swift */,
+				A1234567890ABCDEF013 /* VisitSchedulingView.swift */,
+				A1234567890ABCDEF015 /* QRCodeDisplayView.swift */,
+				A1234567890ABCDEF017 /* VisitStatusView.swift */,
+				A1234567890ABCDEF019 /* CheckOutView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF040 /* ComponentsViews */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF021 /* CustomButton.swift */,
+				A1234567890ABCDEF023 /* CustomTextField.swift */,
+				A1234567890ABCDEF025 /* QRCodeView.swift */,
+				A1234567890ABCDEF027 /* HeaderView.swift */,
+			);
+			path = ComponentsViews;
+			sourceTree = "<group>";
+		};
+		A1234567890ABCDEF041 /* root */ = {
+			isa = PBXGroup;
+			children = (
+				A1234567890ABCDEF003 /* ContentView.swift */,
+			);
+			path = root;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1234567890ABCDEF042 /* GuestHubMobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1234567890ABCDEF043 /* Build configuration list for PBXNativeTarget "GuestHubMobile" */;
+			buildPhases = (
+				A1234567890ABCDEF044 /* Sources */,
+				A1234567890ABCDEF031 /* Frameworks */,
+				A1234567890ABCDEF045 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F5D9AF7C2E8EC41C008EB91F /* root */,
+			);
+			name = GuestHubMobile;
+			productName = GuestHubMobile;
+			productReference = A1234567890ABCDEF030 /* GuestHubMobile.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1234567890ABCDEF046 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					A1234567890ABCDEF042 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = A1234567890ABCDEF047 /* Build configuration list for PBXProject "GuestHubMobile" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A1234567890ABCDEF032;
+			productRefGroup = A1234567890ABCDEF034 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1234567890ABCDEF042 /* GuestHubMobile */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A1234567890ABCDEF045 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5D9AF762E8EC3BB008EB91F /* Assets.xcassets in Resources */,
+				F54A93C32EA31FA600F50C5D /* Assets.xcassets in Resources */,
+				F54A93C12EA31F6000F50C5D /* Contents.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1234567890ABCDEF044 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1234567890ABCDEF001 /* GuestHubApp.swift in Sources */,
+				A1234567890ABCDEF002 /* ContentView.swift in Sources */,
+				A1234567890ABCDEF004 /* NavigationManager.swift in Sources */,
+				A1234567890ABCDEF006 /* VisitorDataService.swift in Sources */,
+				A1234567890ABCDEF008 /* WelcomeView.swift in Sources */,
+				A1234567890ABCDEF012 /* VisitSchedulingView.swift in Sources */,
+				A1234567890ABCDEF014 /* QRCodeDisplayView.swift in Sources */,
+				A1234567890ABCDEF016 /* VisitStatusView.swift in Sources */,
+				A1234567890ABCDEF018 /* CheckOutView.swift in Sources */,
+				A1234567890ABCDEF020 /* CustomButton.swift in Sources */,
+				A1234567890ABCDEF022 /* CustomTextField.swift in Sources */,
+				F54A93C82EA3204200F50C5D /* ScheduledVisitsListView.swift in Sources */,
+				F54A93CA2EA3204200F50C5D /* VisitCreatedView.swift in Sources */,
+				F5D9AF7E2E8EC41C008EB91F /* EmployeeSelectionView.swift in Sources */,
+				F5D9AF7F2E8EC41C008EB91F /* ConfirmationView.swift in Sources */,
+				F5D9AF802E8EC41C008EB91F /* FrequentVisitorInfoView.swift in Sources */,
+				F5D9AF812E8EC41C008EB91F /* LanguageSelectionView.swift in Sources */,
+				F5D9AF822E8EC41C008EB91F /* VisitorOptionsView.swift in Sources */,
+				A1234567890ABCDEF024 /* QRCodeView.swift in Sources */,
+				A1234567890ABCDEF026 /* HeaderView.swift in Sources */,
+				F54A93BC2EA31F0600F50C5D /* APIService.swift in Sources */,
+				F54A93BD2EA31F0600F50C5D /* VisitorService.swift in Sources */,
+				F54A93BE2EA31F0600F50C5D /* VisitService.swift in Sources */,
+				F54A93BF2EA31F0600F50C5D /* EmployeeService.swift in Sources */,
+				A1234567890ABCDEF028 /* AppConfig.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A1234567890ABCDEF048 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A1234567890ABCDEF049 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A1234567890ABCDEF050 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GuestHubMobile/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guesthub.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1234567890ABCDEF051 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"GuestHubMobile/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guesthub.mobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1234567890ABCDEF043 /* Build configuration list for PBXNativeTarget "GuestHubMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1234567890ABCDEF050 /* Debug */,
+				A1234567890ABCDEF051 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1234567890ABCDEF047 /* Build configuration list for PBXProject "GuestHubMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1234567890ABCDEF048 /* Debug */,
+				A1234567890ABCDEF049 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A1234567890ABCDEF046 /* Project object */;
+}

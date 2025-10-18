@@ -86,7 +86,7 @@ struct QRCodeDisplayView: View {
                 }
                 
                 CustomButton("Nouvelle visite", style: .secondary) {
-                    navigationManager.navigateTo(.visitorRegistration)
+                    navigationManager.navigateTo(.visitorOptions)
                 }
             }
             .padding(.horizontal)

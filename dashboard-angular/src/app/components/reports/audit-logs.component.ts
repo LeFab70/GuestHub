@@ -89,7 +89,7 @@ interface User {
                 {{ log.dateHeure | date:'dd/MM/yyyy HH:mm:ss' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ log.user?.login || 'Système' }}
+                {{ log.user?.prenom }} {{ log.user?.nom }} ({{ log.user?.email }})
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span [class]="getActionClass(log.action)" 
@@ -168,8 +168,8 @@ export class AuditLogsComponent implements OnInit {
   loadLogs() {
     this.apiService.getAuditLogs().subscribe({
       next: (response) => {
-        if (response.success && response.data && response.data.data) {
-          this.logs = response.data.data.map((log: any) => ({
+        if (response.success && response.data && response.data.logs) {
+          this.logs = response.data.logs.map((log: any) => ({
             id: log.id,
             dateHeure: new Date(log.dateHeure),
             action: log.action,
@@ -178,10 +178,10 @@ export class AuditLogsComponent implements OnInit {
             userId: log.userId,
             user: log.user ? {
               id: log.user.id,
-              login: log.user.email,
-              motDePasse: '',
+              nom: log.user.nom,
+              prenom: log.user.prenom,
               email: log.user.email,
-              actif: true
+              role: log.user.role
             } : null,
             details: log.details
           }));

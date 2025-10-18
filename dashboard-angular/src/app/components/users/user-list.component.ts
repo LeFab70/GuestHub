@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -11,7 +11,7 @@ interface User {
   nom: string;
   prenom: string;
   email: string;
-  role: 'ADMIN' | 'RECEPTIONNISTE' | 'USER';
+  role: 'ADMIN' | 'RECEPTIONNISTE';
   isActive: boolean;
   passwordResetRequired?: boolean;
   createdAt: Date;
@@ -56,10 +56,9 @@ interface User {
               [(ngModel)]="selectedRole"
               (change)="filterUsers()"
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">Tous les rôles</option>
-              <option value="ADMIN">Administrateur</option>
-              <option value="RECEPTIONNISTE">Réceptionniste</option>
-              <option value="USER">Utilisateur</option>
+                     <option value="">Tous les rôles</option>
+                     <option value="ADMIN">Administrateur</option>
+                     <option value="RECEPTIONNISTE">Réceptionniste</option>
             </select>
           </div>
           <div>
@@ -156,36 +155,27 @@ interface User {
                   <div class="flex space-x-2">
                     <button 
                       (click)="editUser(user)"
-                      class="inline-flex items-center px-2 py-1 text-xs font-medium text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                      </svg>
-                      Modifier
+                      class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-50 transition-colors" 
+                      title="Modifier l'utilisateur">
+                      <span class="material-icons text-sm">edit</span>
                     </button>
                     <button 
                       (click)="toggleUserStatus(user)"
-                      [class]="user.isActive ? 'inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-900 hover:bg-red-50 rounded' : 'inline-flex items-center px-2 py-1 text-xs font-medium text-green-600 hover:text-green-900 hover:bg-green-50 rounded'">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path *ngIf="user.isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
-                        <path *ngIf="!user.isActive" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      {{ user.isActive ? 'Désactiver' : 'Activer' }}
+                      [class]="getToggleButtonClass(user.isActive)"
+                      [title]="getToggleButtonTitle(user.isActive)">
+                      <span class="material-icons text-sm">{{ user.isActive ? 'person_off' : 'person_add' }}</span>
                     </button>
                     <button 
                       (click)="resetUserPassword(user)"
-                      class="inline-flex items-center px-2 py-1 text-xs font-medium text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
-                      </svg>
-                      Reset MDP
+                      class="text-orange-600 hover:text-orange-900 p-2 rounded-full hover:bg-orange-50 transition-colors" 
+                      title="Réinitialiser le mot de passe">
+                      <span class="material-icons text-sm">lock_reset</span>
                     </button>
                     <button 
                       (click)="deleteUser(user)"
-                      class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-600 hover:text-red-900 hover:bg-red-50 rounded">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                      </svg>
-                      Supprimer
+                      class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors" 
+                      title="Supprimer l'utilisateur">
+                      <span class="material-icons text-sm">delete</span>
                     </button>
                   </div>
                 </td>
@@ -222,7 +212,7 @@ interface User {
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900">
-            {{ isEditing ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur' }}
+            {{ modalTitle }}
           </h3>
           <button 
             (click)="closeModal()" 
@@ -237,6 +227,7 @@ interface User {
             <input 
               type="text" 
               [(ngModel)]="userForm.prenom"
+              (input)="generateLoginFromForm()"
               name="prenom"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -247,6 +238,7 @@ interface User {
             <input 
               type="text" 
               [(ngModel)]="userForm.nom"
+              (input)="generateLoginFromForm()"
               name="nom"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -257,20 +249,12 @@ interface User {
             <input 
               type="email" 
               [(ngModel)]="userForm.email"
+              (input)="generateLoginFromForm()"
               name="email"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Login</label>
-            <input 
-              type="text" 
-              [(ngModel)]="userForm.login"
-              name="login"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-          </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Rôle</label>
@@ -279,21 +263,29 @@ interface User {
               name="role"
               required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="USER">Utilisateur</option>
               <option value="RECEPTIONNISTE">Réceptionniste</option>
               <option value="ADMIN">Administrateur</option>
             </select>
           </div>
 
           <div *ngIf="!isEditing">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe temporaire</label>
-            <app-password-input
-              placeholder="Entrez un mot de passe temporaire"
-              [(ngModel)]="userForm.password"
-              name="password"
-              [required]="!isEditing">
-            </app-password-input>
-            <p class="text-xs text-gray-500 mt-1">L'utilisateur devra changer ce mot de passe lors de sa première connexion</p>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe temporaire généré</label>
+            <div class="relative">
+              <input 
+                type="text" 
+                [value]="userForm.password"
+                readonly
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-900 font-mono pr-10">
+              <button 
+                type="button"
+                (click)="userForm.password = generateRandomPassword()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Mot de passe généré automatiquement. L'utilisateur devra le changer lors de sa première connexion.</p>
           </div>
 
           <div class="flex items-center">
@@ -407,7 +399,7 @@ export class UserListComponent implements OnInit {
     prenom: '',
     nom: '',
     email: '',
-    role: 'USER' as 'ADMIN' | 'RECEPTIONNISTE' | 'USER',
+    role: 'RECEPTIONNISTE' as 'ADMIN' | 'RECEPTIONNISTE',
     password: '',
     isActive: true
   };
@@ -421,11 +413,24 @@ export class UserListComponent implements OnInit {
     email: ''
   };
 
-  constructor(
-    private apiService: ApiService,
-    private toastService: ToastService,
-    private authService: AuthService
-  ) {}
+  private apiService = inject(ApiService);
+  private toastService = inject(ToastService);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
+
+  get modalTitle(): string {
+    return this.isEditing ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur';
+  }
+
+  getToggleButtonTitle(isActive: boolean): string {
+    return isActive ? 'Désactiver l\'utilisateur' : 'Activer l\'utilisateur';
+  }
+
+  getToggleButtonClass(isActive: boolean): string {
+    return isActive 
+      ? 'text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors'
+      : 'text-green-600 hover:text-green-900 p-2 rounded-full hover:bg-green-50 transition-colors';
+  }
 
   ngOnInit() {
     // Vérifier si l'utilisateur est connecté avant de charger les données
@@ -498,26 +503,28 @@ export class UserListComponent implements OnInit {
       prenom: '',
       nom: '',
       email: '',
-      role: 'USER',
-      password: '',
+      role: 'RECEPTIONNISTE',
+      password: this.generateRandomPassword(),
       isActive: true
     };
     this.showModal = true;
+    this.cdr.detectChanges();
   }
 
   editUser(user: User) {
     this.isEditing = true;
     this.userForm = {
-      id: user.id,
-      login: user.email, // Using email as login for now
-      prenom: user.prenom,
-      nom: user.nom,
-      email: user.email,
-      role: user.role,
-      password: '',
-      isActive: user.isActive
+      id: user.id || '',
+      login: user.email || '', // Use email as login
+      prenom: user.prenom || '',
+      nom: user.nom || '',
+      email: user.email || '',
+      role: (user.role === 'ADMIN' || user.role === 'RECEPTIONNISTE') ? user.role : 'RECEPTIONNISTE',
+      password: '', // Never populate password in edit mode
+      isActive: user.isActive !== undefined ? user.isActive : true
     };
     this.showModal = true;
+    this.cdr.detectChanges();
   }
 
   closeModal() {
@@ -526,26 +533,57 @@ export class UserListComponent implements OnInit {
     this.isSaving = false;
   }
 
+  generateLogin(prenom: string, nom: string, email: string): string {
+    // Use email as login (it's already unique and valid)
+    return email;
+  }
+
+  generateLoginFromForm() {
+    // Always update login to match email
+    this.userForm.login = this.userForm.email || '';
+  }
+
+  generateRandomPassword(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  }
+
   async saveUser() {
+    // Generate login if not provided or too short
+    if (!this.userForm.login || this.userForm.login.length < 3) {
+      this.userForm.login = this.generateLogin(
+        this.userForm.prenom || '', 
+        this.userForm.nom || '', 
+        this.userForm.email || ''
+      );
+    }
+    
     this.isSaving = true;
     
     try {
       if (this.isEditing) {
-        // Update user
-        this.apiService.updateUser(this.userForm.id, this.userForm).subscribe({
+        // Update user (remove password from update data)
+        const { password, ...updateData } = this.userForm;
+        
+        this.apiService.updateUser(this.userForm.id, updateData).subscribe({
           next: (response) => {
             if (response.success) {
               this.toastService.success('Utilisateur modifié', 'L\'utilisateur a été modifié avec succès');
               this.loadUsers();
               this.closeModal();
             } else {
-              this.toastService.error('Erreur', response.message || 'Erreur lors de la modification');
+              this.toastService.error('Erreur de modification', response.error || response.message || 'Une erreur est survenue lors de la modification de l\'utilisateur.');
             }
             this.isSaving = false;
           },
           error: (error) => {
             console.error('Error updating user:', error);
-            this.toastService.error('Erreur', 'Une erreur est survenue lors de la modification');
+            const errorMessage = this.getErrorMessage(error);
+            this.toastService.error('Erreur de modification', errorMessage);
             this.isSaving = false;
           }
         });
@@ -554,17 +592,18 @@ export class UserListComponent implements OnInit {
         this.apiService.createUser(this.userForm).subscribe({
           next: (response) => {
             if (response.success) {
-              this.toastService.success('Utilisateur créé', 'L\'utilisateur a été créé avec succès');
+              this.toastService.success('Utilisateur créé', `L'utilisateur a été créé avec succès. Mot de passe temporaire: ${this.userForm.password}`);
               this.loadUsers();
               this.closeModal();
             } else {
-              this.toastService.error('Erreur', response.message || 'Erreur lors de la création');
+              this.toastService.error('Erreur de création', response.error || response.message || 'Une erreur est survenue lors de la création de l\'utilisateur.');
             }
             this.isSaving = false;
           },
           error: (error) => {
             console.error('Error creating user:', error);
-            this.toastService.error('Erreur', 'Une erreur est survenue lors de la création');
+            const errorMessage = this.getErrorMessage(error);
+            this.toastService.error('Erreur de création', errorMessage);
             this.isSaving = false;
           }
         });
@@ -573,6 +612,24 @@ export class UserListComponent implements OnInit {
       this.toastService.error('Erreur', 'Une erreur est survenue lors de la sauvegarde');
       this.isSaving = false;
     }
+  }
+
+  getErrorMessage(error: any): string {
+    if (error.error) {
+      if (error.error.details && Array.isArray(error.error.details)) {
+        return error.error.details.map((detail: any) => detail.message).join(', ');
+      }
+      if (error.error.error) {
+        return error.error.error;
+      }
+      if (error.error.message) {
+        return error.error.message;
+      }
+    }
+    if (error.message) {
+      return error.message;
+    }
+    return 'Une erreur inattendue s\'est produite';
   }
 
   async toggleUserStatus(user: User) {
@@ -673,7 +730,6 @@ export class UserListComponent implements OnInit {
     switch (role) {
       case 'ADMIN': return 'bg-red-100 text-red-800';
       case 'RECEPTIONNISTE': return 'bg-green-100 text-green-800';
-      case 'USER': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   }
@@ -682,7 +738,6 @@ export class UserListComponent implements OnInit {
     switch (role) {
       case 'ADMIN': return 'Administrateur';
       case 'RECEPTIONNISTE': return 'Réceptionniste';
-      case 'USER': return 'Utilisateur';
       default: return role;
     }
   }

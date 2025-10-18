@@ -73,7 +73,7 @@ export const generalRateLimit = createRateLimit(
 // Strict rate limiter for auth endpoints (login/register only)
 export const authRateLimit = createRateLimit(
   5 * 60 * 1000, // 5 minutes (réduit de 15 à 5 minutes)
-  config.DISABLE_RATE_LIMIT ? 1000 : 50, // 1000 attempts si rate limiting désactivé, sinon 50
+  config.DISABLE_RATE_LIMIT ? 1000 : 100, // 1000 attempts si rate limiting désactivé, sinon 100 (augmenté de 50 à 100)
   'Trop de tentatives de connexion. Veuillez réessayer plus tard'
 );
 
@@ -82,6 +82,13 @@ export const apiRateLimit = createRateLimit(
   2 * 60 * 1000, // 2 minutes
   500, // 500 requests per 2 minutes
   'Too many API requests, please try again later'
+);
+
+// Very permissive rate limiter for dashboard endpoints
+export const dashboardRateLimit = createRateLimit(
+  1 * 60 * 1000, // 1 minute
+  1000, // 1000 requests per minute (très permissif pour les dashboards)
+  'Too many dashboard requests, please try again later'
 );
 
 // File upload rate limiter

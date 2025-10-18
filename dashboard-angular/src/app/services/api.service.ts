@@ -1,15 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, interval, switchMap, startWith, takeUntil, Subject } from 'rxjs';
 import { User, Employe, Visiteur, Departement, Visite, Badge, Role, Permission, AuditLog } from '../models/user.model';
+import { DashboardUpdateService } from './dashboard-update.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = 'http://localhost:3001/api';
+  private dashboardUpdateService = inject(DashboardUpdateService);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    // La surveillance des visites est maintenant gérée par VisitMonitoringService
+  }
 
   // Authentication
   login(credentials: { email: string; password: string }): Observable<any> {
@@ -51,7 +55,7 @@ export class ApiService {
   }
 
   createUser(user: Partial<User>): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/auth/users/with-role`, user);
+    return this.http.post<any>(`${this.baseUrl}/auth/register`, user);
   }
 
   createAdmin(user: Partial<User>): Observable<any> {
@@ -162,9 +166,29 @@ export class ApiService {
     return this.http.delete<void>(`${this.baseUrl}/visits/${id}`);
   }
 
+  checkInVisit(id: string): Observable<any> {
+    return this.http.patch<any>(`${this.baseUrl}/visits/${id}/check-in`, {});
+  }
+
+  checkOutVisit(id: string): Observable<any> {
+    return this.http.patch<any>(`${this.baseUrl}/visits/${id}/check-out`, {});
+  }
+
   // Badges
-  getBadges(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/badges`);
+  getBadges(params?: any): Observable<any> {
+    let url = `${this.baseUrl}/badges`;
+    if (params) {
+      const queryParams = new URLSearchParams();
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          queryParams.append(key, params[key]);
+        }
+      });
+      if (queryParams.toString()) {
+        url += `?${queryParams.toString()}`;
+      }
+    }
+    return this.http.get<any>(url);
   }
 
   scanBadge(qrCode: string): Observable<any> {
@@ -256,5 +280,52 @@ export class ApiService {
       userId,
       newPassword
     });
+  }
+
+  // Badge methods
+  printBadge(badgeId: string): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/badges/${badgeId}/print`, {});
+  }
+
+  useBadge(badgeId: string): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/badges/${badgeId}/use`, {});
+  }
+
+  returnBadge(badgeId: string): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/badges/${badgeId}/return`, {});
+  }
+
+  // Visit expiration methods
+  triggerExpirationCheck(): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/visit-expiration/check`, {});
+  }
+
+  getExpirationStatus(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/visit-expiration/status`);
+  }
+
+  countVisitsToExpire(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/visit-expiration/count`);
+  }
+
+  // Visit statistics
+  getVisitStatistics(dateFrom: string, dateTo: string, criteria: string): Observable<any> {
+    const params = new URLSearchParams();
+    params.set('dateFrom', dateFrom);
+    params.set('dateTo', dateTo);
+    params.set('criteria', criteria);
+    
+    return this.http.get<any>(`${this.baseUrl}/visit-statistics/statistics?${params.toString()}`);
+  }
+
+  // Obtenir les visites récentes (pour les notifications)
+  getRecentVisits(): Observable<any> {
+    const since = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes
+    return this.http.get<any>(`${this.baseUrl}/visits/recent?since=${since.toISOString()}`);
+  }
+
+  // Obtenir les visites récentes avec un timestamp spécifique
+  getRecentVisitsWithTimestamp(since: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/visits/recent?since=${since}`);
   }
 }

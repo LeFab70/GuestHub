@@ -1,7 +1,15 @@
 import { Router } from 'express';
+import { param } from 'express-validator';
 import { visitorController } from '../controllers/visitor.controller';
-import { visitorValidations } from '../validators';
+import { visitorValidations, handleValidationErrors } from '../validators';
 import { authRateLimit } from '../middlewares/security';
+import { authenticateToken, requireReceptionistOrAdmin } from '../middlewares/auth';
+
+// Custom validators
+const isValidCUID = (value: string): boolean => {
+  const cuidPattern = /^c[a-z0-9]{24}$/;
+  return cuidPattern.test(value);
+};
 
 const router = Router();
 
@@ -41,7 +49,7 @@ const router = Router();
  *       500:
  *         description: Erreur serveur
  */
-router.post('/', authRateLimit, ...visitorValidations.create, visitorController.createVisitor);
+router.post('/', authenticateToken, requireReceptionistOrAdmin, authRateLimit, ...visitorValidations.create, visitorController.createVisitor);
 
 /**
  * @swagger
@@ -81,7 +89,65 @@ router.post('/', authRateLimit, ...visitorValidations.create, visitorController.
  *       500:
  *         description: Erreur serveur
  */
-router.get('/', visitorController.getAllVisitors);
+router.get('/', authenticateToken, requireReceptionistOrAdmin, visitorController.getAllVisitors);
+
+/**
+ * @swagger
+ * /api/visitors/public/search:
+ *   get:
+ *     summary: Rechercher des visiteurs (endpoint public pour mobile)
+ *     tags: [Visitors]
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Résultats de recherche récupérés avec succès
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get('/public/search', visitorController.searchVisitorsPublic);
+
+/**
+ * @swagger
+ * /api/visitors/public:
+ *   post:
+ *     summary: Créer un nouveau visiteur (endpoint public pour mobile)
+ *     tags: [Visitors]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nom
+ *               - prenom
+ *               - email
+ *               - telephone
+ *               - entreprise
+ *             properties:
+ *               nom:
+ *                 type: string
+ *               prenom:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               telephone:
+ *                 type: string
+ *               entreprise:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Visiteur créé avec succès
+ *       400:
+ *         description: Données invalides
+ *       500:
+ *         description: Erreur serveur
+ */
+router.post('/public', authRateLimit, ...visitorValidations.create, visitorController.createVisitorPublic);
 
 /**
  * @swagger
@@ -121,7 +187,7 @@ router.get('/', visitorController.getAllVisitors);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/search', visitorController.searchVisitors);
+router.get('/search', authenticateToken, requireReceptionistOrAdmin, visitorController.searchVisitors);
 
 /**
  * @swagger
@@ -143,7 +209,7 @@ router.get('/search', visitorController.searchVisitors);
  *       500:
  *         description: Erreur serveur
  */
-router.get('/:id', visitorController.getVisitorById);
+router.get('/:id', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitorController.getVisitorById);
 
 /**
  * @swagger
@@ -186,7 +252,7 @@ router.get('/:id', visitorController.getVisitorById);
  *       500:
  *         description: Erreur serveur
  */
-router.put('/:id', ...visitorValidations.update, visitorController.updateVisitor);
+router.put('/:id', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), ...visitorValidations.update, visitorController.updateVisitor);
 
 /**
  * @swagger
@@ -208,7 +274,7 @@ router.put('/:id', ...visitorValidations.update, visitorController.updateVisitor
  *       500:
  *         description: Erreur serveur
  */
-router.delete('/:id', visitorController.deleteVisitor);
+router.delete('/:id', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitorController.deleteVisitor);
 
 /**
  * @swagger
@@ -241,6 +307,6 @@ router.delete('/:id', visitorController.deleteVisitor);
  *       500:
  *         description: Erreur serveur
  */
-router.patch('/:id/toggle-blacklist', visitorController.toggleBlacklist);
+router.patch('/:id/toggle-blacklist', authenticateToken, requireReceptionistOrAdmin, param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors, visitorController.toggleBlacklist);
 
 export default router;

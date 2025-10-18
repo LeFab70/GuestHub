@@ -128,7 +128,7 @@ export const userValidations = {
     handleValidationErrors
   ],
   
-  getById: [commonValidations.id, handleValidationErrors],
+  getById: [param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors],
   
   list: [
     commonValidations.page,
@@ -155,7 +155,7 @@ export const departmentValidations = {
     handleValidationErrors
   ],
   
-  getById: [commonValidations.id, handleValidationErrors],
+  getById: [param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors],
   
   list: [
     commonValidations.page,
@@ -221,7 +221,7 @@ export const employeeValidations = {
     handleValidationErrors
   ],
   
-  getById: [commonValidations.id, handleValidationErrors],
+  getById: [param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors],
   
   list: [
     commonValidations.page,
@@ -246,7 +246,7 @@ export const visitorValidations = {
     body('nom').isLength({ min: 2, max: 50 }).withMessage('Name must be between 2 and 50 characters'),
     body('prenom').isLength({ min: 2, max: 50 }).withMessage('First name must be between 2 and 50 characters'),
     body('email').optional().isEmail().normalizeEmail().withMessage('Must be a valid email address'),
-    body('telephone').optional().isMobilePhone('any').withMessage('Must be a valid phone number'),
+    body('telephone').optional().isLength({ min: 8, max: 20 }).withMessage('Phone number must be between 8 and 20 characters'),
     body('entreprise').optional().isLength({ max: 100 }).withMessage('Company name must not exceed 100 characters'),
     handleValidationErrors
   ],
@@ -255,13 +255,13 @@ export const visitorValidations = {
     body('nom').optional().isLength({ min: 2, max: 50 }).withMessage('Name must be between 2 and 50 characters'),
     body('prenom').optional().isLength({ min: 2, max: 50 }).withMessage('First name must be between 2 and 50 characters'),
     body('email').optional().isEmail().normalizeEmail().withMessage('Must be a valid email address'),
-    body('telephone').optional().isMobilePhone('any').withMessage('Must be a valid phone number'),
+    body('telephone').optional().isLength({ min: 8, max: 20 }).withMessage('Phone number must be between 8 and 20 characters'),
     body('entreprise').optional().isLength({ max: 100 }).withMessage('Company name must not exceed 100 characters'),
     body('estBlackliste').optional().isBoolean().withMessage('estBlackliste must be a boolean'),
     handleValidationErrors
   ],
   
-  getById: [commonValidations.id, handleValidationErrors],
+  getById: [param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors],
   
   list: [
     commonValidations.page,
@@ -278,8 +278,8 @@ export const visitValidations = {
     body('dateDebut').isISO8601().withMessage('Start date must be a valid date in ISO 8601 format'),
     body('dateFin').optional().isISO8601().withMessage('End date must be a valid date in ISO 8601 format'),
     body('motif').isLength({ min: 5, max: 500 }).withMessage('Purpose must be between 5 and 500 characters'),
-    body('visiteurId').isUUID().withMessage('Visitor ID must be a valid UUID'),
-    body('employeId').isUUID().withMessage('Employee ID must be a valid UUID'),
+    body('visiteurId').custom(isValidCUID).withMessage('Visitor ID must be a valid CUID'),
+    body('employeId').optional().custom(isValidCUID).withMessage('Employee ID must be a valid CUID'),
     handleValidationErrors
   ],
   
@@ -287,13 +287,13 @@ export const visitValidations = {
     body('dateDebut').optional().isISO8601().withMessage('Start date must be a valid date in ISO 8601 format'),
     body('dateFin').optional().isISO8601().withMessage('End date must be a valid date in ISO 8601 format'),
     body('motif').optional().isLength({ min: 5, max: 500 }).withMessage('Purpose must be between 5 and 500 characters'),
+    body('visiteurId').optional().custom(isValidCUID).withMessage('Visitor ID must be a valid CUID'),
+    body('employeId').optional().custom(isValidCUID).withMessage('Employee ID must be a valid CUID'),
     body('statut').optional().isIn(['PLANIFIEE', 'EN_COURS', 'TERMINEE', 'ANNULEE']).withMessage('Invalid status'),
-    body('visiteurId').optional().isUUID().withMessage('Visitor ID must be a valid UUID'),
-    body('employeId').optional().isUUID().withMessage('Employee ID must be a valid UUID'),
     handleValidationErrors
   ],
   
-  getById: [commonValidations.id, handleValidationErrors],
+  getById: [param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors],
   
   list: [
     commonValidations.page,
@@ -311,22 +311,22 @@ export const visitValidations = {
 // Badge validations
 export const badgeValidations = {
   create: [
-    body('visiteId').isUUID().withMessage('Visit ID must be a valid UUID'),
+    body('visiteId').custom(isValidCUID).withMessage('Visit ID must be a valid CUID'),
     handleValidationErrors
   ],
   
   update: [
-    body('etat').isIn(['GENERE', 'EN_ATTENTE_VALIDATION', 'IMPRIME', 'VALIDE', 'RENDU', 'SCANNE', 'AUTO_EXPIRE']).withMessage('Invalid badge state'),
+    body('etat').isIn(['GENERE', 'EN_ATTENTE_IMPRESSION', 'IMPRIME', 'EN_UTILISATION', 'RENDU', 'EXPIRE', 'ANNULE']).withMessage('Invalid badge state'),
     handleValidationErrors
   ],
   
-  getById: [commonValidations.id, handleValidationErrors],
+  getById: [param('id').custom(isValidCUID).withMessage('ID must be a valid CUID'), handleValidationErrors],
   
   list: [
     commonValidations.page,
     commonValidations.limit,
-    query('etat').optional().isIn(['GENERE', 'EN_ATTENTE_VALIDATION', 'IMPRIME', 'VALIDE', 'RENDU', 'SCANNE', 'AUTO_EXPIRE']).withMessage('Invalid state filter'),
-    query('visiteId').optional().isUUID().withMessage('Visit ID must be a valid UUID'),
+    query('etat').optional().isIn(['GENERE', 'EN_ATTENTE_IMPRESSION', 'IMPRIME', 'EN_UTILISATION', 'RENDU', 'EXPIRE', 'ANNULE']).withMessage('Invalid state filter'),
+    query('visiteId').optional().custom(isValidCUID).withMessage('Visit ID must be a valid CUID'),
     handleValidationErrors
   ]
 };

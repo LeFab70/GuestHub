@@ -44,7 +44,7 @@ struct VisitStatusView: View {
             
             VStack(spacing: 16) {
                 CustomButton("Nouvelle visite", style: .primary) {
-                    navigationManager.navigateTo(.visitorRegistration)
+                    navigationManager.navigateTo(.visitorOptions)
                 }
                 
                 CustomButton("Accueil", style: .secondary) {

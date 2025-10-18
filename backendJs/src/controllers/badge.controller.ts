@@ -173,7 +173,7 @@ export class BadgeController {
     try {
       const { qrCode } = req.body;
       
-      const badge = await badgeService.scanBadge(qrCode);
+      const badge = await badgeService.scanBadge(qrCode, req.user?.id);
       
       if (!badge) {
         const response: ApiResponse = {
@@ -334,6 +334,78 @@ export class BadgeController {
       const response: ApiResponse = {
         success: false,
         message: error.message || 'Failed to generate QR code',
+        statusCode: error.statusCode || 500
+      };
+      return res.status(response.statusCode).json(response);
+    }
+  }
+
+  // Imprimer un badge
+  async printBadge(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      const printedByUserId = req.user?.id;
+      const badge = await badgeService.printBadge(id, printedByUserId);
+      
+      const response: ApiResponse = {
+        success: true,
+        message: 'Badge imprimé avec succès',
+        data: badge,
+        statusCode: 200
+      };
+      return res.status(200).json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        message: error.message || 'Erreur lors de l\'impression du badge',
+        statusCode: error.statusCode || 500
+      };
+      return res.status(response.statusCode).json(response);
+    }
+  }
+
+  // Marquer un badge comme en utilisation
+  async useBadge(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      
+      const badge = await badgeService.useBadge(id);
+      
+      const response: ApiResponse = {
+        success: true,
+        message: 'Badge marqué comme en utilisation',
+        data: badge,
+        statusCode: 200
+      };
+      return res.status(200).json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        message: error.message || 'Erreur lors de l\'utilisation du badge',
+        statusCode: error.statusCode || 500
+      };
+      return res.status(response.statusCode).json(response);
+    }
+  }
+
+  // Marquer un badge comme rendu
+  async returnBadge(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    try {
+      const { id } = req.params;
+      
+      const badge = await badgeService.returnBadge(id, req.user?.id);
+      
+      const response: ApiResponse = {
+        success: true,
+        message: 'Badge marqué comme rendu',
+        data: badge,
+        statusCode: 200
+      };
+      return res.status(200).json(response);
+    } catch (error: any) {
+      const response: ApiResponse = {
+        success: false,
+        message: error.message || 'Erreur lors du retour du badge',
         statusCode: error.statusCode || 500
       };
       return res.status(response.statusCode).json(response);
