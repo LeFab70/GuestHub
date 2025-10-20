@@ -7,8 +7,10 @@ struct GuestHubApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .ignoresSafeArea()
+                .ignoresSafeArea(.all, edges: .all)
+                .preferredColorScheme(.light)
         }
+        .windowResizability(.contentSize)
     }
 }
 
@@ -27,12 +29,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         if let windowScene = scene as? UIWindowScene {
-            // ✅ Désactive Split View (force plein écran)
+            // Configuration pour tablette en plein écran
             windowScene.sizeRestrictions?.minimumSize = CGSize(width: 1024, height: 768)
             windowScene.sizeRestrictions?.maximumSize = CGSize(width: 1024, height: 768)
             
+            // Désactiver Split View et Slide Over
+            windowScene.sizeRestrictions?.allowsFullScreen = true
+            
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: ContentView().ignoresSafeArea())
+            window.rootViewController = UIHostingController(
+                rootView: ContentView()
+                    .ignoresSafeArea(.all, edges: .all)
+                    .preferredColorScheme(.light)
+            )
             self.window = window
             window.makeKeyAndVisible()
         }

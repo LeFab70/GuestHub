@@ -51,7 +51,7 @@ struct VisitSchedulingView: View {
                             .foregroundColor(.primary)
                         
                         DatePicker("", selection: $startTime, displayedComponents: .hourAndMinute)
-                            .datePickerStyle(CompactDatePickerStyle())
+                            .datePickerStyle(WheelDatePickerStyle())
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
@@ -66,7 +66,7 @@ struct VisitSchedulingView: View {
                             .foregroundColor(.primary)
                         
                         DatePicker("", selection: $endTime, displayedComponents: .hourAndMinute)
-                            .datePickerStyle(CompactDatePickerStyle())
+                            .datePickerStyle(WheelDatePickerStyle())
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 12)

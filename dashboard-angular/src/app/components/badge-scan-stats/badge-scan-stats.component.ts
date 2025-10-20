@@ -104,7 +104,7 @@ import { Subscription, interval } from 'rxjs';
                     [class]="scan.action === 'check-out' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'">
                 {{ scan.action === 'check-out' ? 'Check-out' : 'Scan' }}
               </span>
-              <span class="text-xs text-gray-500">{{ scan.createdAt | date:'HH:mm' }}</span>
+              <span class="text-xs text-gray-500">{{ scan.createdAt | date:'dd/MM HH:mm' }}</span>
             </div>
           </div>
         </div>
@@ -176,15 +176,25 @@ export class BadgeScanStatsComponent implements OnInit, OnDestroy {
   }
 
   private loadRecentScans() {
-    this.badgeScanStatsApiService.getRecentScans(10).subscribe({
+    this.badgeScanStatsApiService.getRecentScans(50).subscribe({
       next: (response) => {
         if (response.success) {
+          const scans: BadgeScanRecord[] = response.data;
+
+          // Ne garder que les scans du jour courant
+          const now = new Date();
+          const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+          const todaysScans = scans.filter((scan: any) => {
+            const created = new Date(scan.createdAt);
+            return created >= startOfDay;
+          });
+
+          // Optionnel: ne garder que les check-out
           if (this.showOnlyCheckouts) {
-            // Filtrer pour ne montrer que les check-out
-            this.recentScans = response.data.filter((scan: BadgeScanRecord) => scan.action === 'check-out');
+            this.recentScans = todaysScans.filter((scan: any) => scan.action === 'check-out');
           } else {
-            // Montrer tous les scans
-            this.recentScans = response.data;
+            this.recentScans = todaysScans;
           }
         }
       },

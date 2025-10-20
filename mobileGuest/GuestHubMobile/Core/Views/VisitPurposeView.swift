@@ -7,10 +7,11 @@ struct VisitPurposeView: View {
     @StateObject private var visitService = VisitService.shared
     
     @State private var visitMotif: String = ""
-    @State private var estimatedDuration: Int = 30 // en minutes
+    @State private var estimatedDuration: Int = 480 // en minutes (8h par défaut pour visites planifiées)
     @State private var selectedDate: Date = Date()
     
-    let durationOptions = [15, 30, 45, 60, 90, 120, 180, 240] // en minutes
+    let durationOptions = [15, 30, 45, 60, 90, 120, 180, 240, 480] // en minutes (480 = 8h)
+    @Environment(\.horizontalSizeClass) private var sizeClass
     
     var body: some View {
         VStack(spacing: 0) {
@@ -92,26 +93,41 @@ struct VisitPurposeView: View {
                         Text("Estimated Duration")
                             .font(.headline)
                             .foregroundColor(.primary)
-                        
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 12) {
-                            ForEach(durationOptions, id: \.self) { duration in
-                                Button(action: {
-                                    estimatedDuration = duration
-                                }) {
-                                    Text("\(duration) min")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(estimatedDuration == duration ? .white : .blue)
-                                        .frame(maxWidth: .infinity, minHeight: 44)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 10)
-                                        .background(estimatedDuration == duration ? Color.blue : Color.blue.opacity(0.1))
-                                        .cornerRadius(20)
+
+                        if sizeClass == .compact {
+                            Picker("Estimated Duration", selection: $estimatedDuration) {
+                                ForEach(durationOptions, id: \.self) { duration in
+                                    Text(formatDuration(duration)).tag(duration)
                                 }
-                                .buttonStyle(PlainButtonStyle())
                             }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color(.systemGray6))
+                            )
+                        } else {
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 12) {
+                                ForEach(durationOptions, id: \.self) { duration in
+                                    Button(action: {
+                                        estimatedDuration = duration
+                                    }) {
+                                        Text(formatDuration(duration))
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(estimatedDuration == duration ? .white : .blue)
+                                            .frame(maxWidth: .infinity, minHeight: 44)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 10)
+                                            .background(estimatedDuration == duration ? Color.blue : Color.blue.opacity(0.1))
+                                            .cornerRadius(20)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.vertical, 8)
                         }
-                        .padding(.vertical, 8)
                     }
                 }
                 .padding(.horizontal)
@@ -141,6 +157,20 @@ struct VisitPurposeView: View {
         .onAppear {
             // Initialiser la date à aujourd'hui
             selectedDate = Date()
+        }
+    }
+    
+    private func formatDuration(_ minutes: Int) -> String {
+        if minutes >= 60 {
+            let hours = minutes / 60
+            let remainingMinutes = minutes % 60
+            if remainingMinutes == 0 {
+                return "\(hours)h"
+            } else {
+                return "\(hours)h \(remainingMinutes)min"
+            }
+        } else {
+            return "\(minutes) min"
         }
     }
 }

@@ -59,19 +59,19 @@ struct NewVisitorInfoView: View {
                                 .font(.system(size: 60))
                                 .foregroundColor(.blue)
                             
-                            Text("Visitor Found")
+                            Text("Visitor Already Exists")
                                 .font(.title2)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.primary)
                             
-                            Text("We found an existing visitor with this email or phone number. Please use the 'I visit often' option instead.")
+                            Text("We found an existing visitor with this email or phone number. You can proceed as a frequent visitor.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal)
                             
                             VStack(spacing: 12) {
-                                CustomButton("Use Frequent Visitor", style: .primary) {
+                                CustomButton("Continue as Frequent Visitor", style: .primary) {
                                     // Rediriger vers la vue des visiteurs fréquents
                                     navigationManager.isFrequentVisitor = true
                                     navigationManager.navigateTo(.frequentVisitorInfo)
@@ -131,6 +131,15 @@ struct NewVisitorInfoView: View {
                                 TextField("Enter your phone number", text: $telephone)
                                     .textFieldStyle(CustomTextFieldStyle())
                                     .keyboardType(.phonePad)
+                                    .onChange(of: telephone) { _, newValue in
+                                        // Filtrer pour ne garder que les chiffres et les tirets
+                                        let filtered = newValue.filter { character in
+                                            character.isNumber || character == "-"
+                                        }
+                                        if filtered != newValue {
+                                            telephone = filtered
+                                        }
+                                    }
                             }
                             
                             // Entreprise
@@ -249,7 +258,15 @@ struct NewVisitorInfoView: View {
                     visitorService.currentVisitor = visitor
                     showSuccessMessage = true
                 case .failure(let error):
-                    errorMessage = "Error creating visitor: \(error.localizedDescription)"
+                    // Si conflit (visiteur existe), proposer redirection vers visiteur fréquent
+                    let lowerDesc = error.localizedDescription.lowercased()
+                    if lowerDesc.contains("409") || lowerDesc.contains("conflict") || lowerDesc.contains("exists") || lowerDesc.contains("existe") {
+                        self.existingVisitor = nil
+                        showRedirectMessage = true
+                        errorMessage = nil
+                    } else {
+                        errorMessage = "Error creating visitor: \(error.localizedDescription)"
+                    }
                 }
             }
         }

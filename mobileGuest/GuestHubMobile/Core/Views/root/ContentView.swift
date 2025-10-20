@@ -41,6 +41,7 @@ struct ContentView: View {
                 CheckOutView()
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle()) // Force plein écran sur iPad
         .environmentObject(navigationManager)
         .environmentObject(dataService)
     }
