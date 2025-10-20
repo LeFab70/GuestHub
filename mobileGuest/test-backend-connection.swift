@@ -51,3 +51,4 @@ testEndpoint("/badges")
 print()
 print("✅ Backend connection test completed!")
 
+

@@ -47,3 +47,4 @@ function cleanPrintedBadgeNotifications() {
 // Exécuter le nettoyage
 cleanPrintedBadgeNotifications();
 
+
